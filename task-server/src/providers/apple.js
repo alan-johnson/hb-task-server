@@ -22,66 +22,84 @@ class AppleRemindersProvider {
   async getLists() {
     const script = `
       tell application "Reminders"
-        set listData to {}
+        set output to ""
         repeat with aList in lists
-          set end of listData to {id:id of aList, name:name of aList}
+          set output to output & "LIST_START" & linefeed
+          set output to output & "ID:" & id of aList & linefeed
+          set output to output & "NAME:" & name of aList & linefeed
+          set output to output & "LIST_END" & linefeed
         end repeat
-        return listData
+        return output
       end tell
     `;
     
     const result = this.executeAppleScript(script);
-    return this.parseAppleScriptList(result);
+    return this.parseListsOutput(result);
   }
 
   // Get tasks from a specific list
   async getTasks(listId) {
     const script = `
       tell application "Reminders"
-        set taskData to {}
+        set output to ""
         repeat with aList in lists
           if id of aList is "${listId}" then
             repeat with aReminder in reminders of aList
-              set taskInfo to {id:id of aReminder, name:name of aReminder, completed:completed of aReminder}
-              if body of aReminder is not missing value then
-                set end of taskInfo to {notes:body of aReminder}
-              end if
-              if due date of aReminder is not missing value then
-                set end of taskInfo to {dueDate:due date of aReminder as string}
-              end if
-              set end of taskData to taskInfo
+              set output to output & "TASK_START" & linefeed
+              set output to output & "ID:" & id of aReminder & linefeed
+              set output to output & "NAME:" & name of aReminder & linefeed
+              set output to output & "COMPLETED:" & completed of aReminder & linefeed
+              try
+                if body of aReminder is not missing value then
+                  set output to output & "NOTES:" & body of aReminder & linefeed
+                end if
+              end try
+              try
+                if due date of aReminder is not missing value then
+                  set output to output & "DUE:" & (due date of aReminder as string) & linefeed
+                end if
+              end try
+              set output to output & "TASK_END" & linefeed
             end repeat
             exit repeat
           end if
         end repeat
-        return taskData
+        return output
       end tell
     `;
     
     const result = this.executeAppleScript(script);
-    return this.parseAppleScriptList(result);
+    return this.parseTasksOutput(result);
   }
 
   // Get task details
   async getTask(listId, taskId) {
     const script = `
       tell application "Reminders"
+        set output to ""
         repeat with aList in lists
           if id of aList is "${listId}" then
             repeat with aReminder in reminders of aList
               if id of aReminder is "${taskId}" then
-                set taskInfo to {id:id of aReminder, name:name of aReminder, completed:completed of aReminder}
-                if body of aReminder is not missing value then
-                  set taskNotes to body of aReminder
-                else
-                  set taskNotes to ""
-                end if
-                if due date of aReminder is not missing value then
-                  set taskDue to due date of aReminder as string
-                else
-                  set taskDue to ""
-                end if
-                return "ID:" & id of aReminder & "|NAME:" & name of aReminder & "|COMPLETED:" & completed of aReminder & "|NOTES:" & taskNotes & "|DUE:" & taskDue
+                set output to output & "ID:" & id of aReminder & linefeed
+                set output to output & "NAME:" & name of aReminder & linefeed
+                set output to output & "COMPLETED:" & completed of aReminder & linefeed
+                try
+                  if body of aReminder is not missing value then
+                    set output to output & "NOTES:" & body of aReminder & linefeed
+                  end if
+                end try
+                try
+                  if due date of aReminder is not missing value then
+                    set output to output & "DUE:" & (due date of aReminder as string) & linefeed
+                  end if
+                end try
+                try
+                  if creation date of aReminder is not missing value then
+                    set output to output & "CREATED:" & (creation date of aReminder as string) & linefeed
+                  end if
+                end try
+                return output
               end if
             end repeat
           end if
@@ -91,6 +109,9 @@ class AppleRemindersProvider {
     `;
     
     const result = this.executeAppleScript(script);
+    if (!result) {
+      throw new Error('Task not found');
+    }
     return this.parseTaskDetail(result);
   }
 
@@ -128,11 +149,11 @@ class AppleRemindersProvider {
       tell application "Reminders"
         repeat with aList in lists
           if id of aList is "${listId}" then
-            set newReminder to make new reminder at aList with properties {name:"${name.replace(/"/g, '\\"')}"}
+            set newReminder to make new reminder at aList with properties {name:"${this.escapeString(name)}"}
     `;
     
     if (notes) {
-      script += `\n            set body of newReminder to "${notes.replace(/"/g, '\\"')}"`;
+      script += `\n            set body of newReminder to "${this.escapeString(notes)}"`;
     }
     
     script += `
@@ -146,71 +167,107 @@ class AppleRemindersProvider {
     return { id: result, name: name };
   }
 
-  // Parse AppleScript list output
-  parseAppleScriptList(output) {
-    if (!output || output === '') {
+  // Helper to escape strings for AppleScript
+  escapeString(str) {
+    return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+  }
+
+  // Parse lists output
+  parseListsOutput(output) {
+    if (!output || output.trim() === '') {
       return [];
     }
-    
-    // Simple parser for AppleScript records
-    const items = [];
-    const regex = /\{([^}]+)\}/g;
-    let match;
-    
-    while ((match = regex.exec(output)) !== null) {
-      const record = match[1];
-      const item = {};
-      
-      // Parse key:value pairs
-      const pairs = record.split(', ');
-      pairs.forEach(pair => {
-        const [key, ...valueParts] = pair.split(':');
-        const value = valueParts.join(':').trim();
-        
-        if (key && value) {
-          const cleanKey = key.trim();
-          const cleanValue = value.replace(/^"(.*)"$/, '$1');
-          
-          if (cleanKey === 'completed') {
-            item[cleanKey] = cleanValue === 'true';
-          } else {
-            item[cleanKey] = cleanValue;
-          }
+
+    const lists = [];
+    const listBlocks = output.split('LIST_START');
+
+    for (const block of listBlocks) {
+      if (!block.includes('LIST_END')) continue;
+
+      const lines = block.split('\n');
+      const list = {};
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('ID:')) {
+          list.id = trimmed.substring(3).trim();
+        } else if (trimmed.startsWith('NAME:')) {
+          list.name = trimmed.substring(5).trim();
         }
-      });
-      
-      items.push(item);
+      }
+
+      if (list.id && list.name) {
+        lists.push(list);
+      }
     }
-    
-    return items;
+
+    return lists;
+  }
+
+  // Parse tasks output
+  parseTasksOutput(output) {
+    if (!output || output.trim() === '') {
+      return [];
+    }
+
+    const tasks = [];
+    const taskBlocks = output.split('TASK_START');
+
+    for (const block of taskBlocks) {
+      if (!block.includes('TASK_END')) continue;
+
+      const lines = block.split('\n');
+      const task = {};
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('ID:')) {
+          task.id = trimmed.substring(3).trim();
+        } else if (trimmed.startsWith('NAME:')) {
+          task.name = trimmed.substring(5).trim();
+        } else if (trimmed.startsWith('COMPLETED:')) {
+          task.completed = trimmed.substring(10).trim() === 'true';
+        } else if (trimmed.startsWith('NOTES:')) {
+          task.notes = trimmed.substring(6).trim();
+        } else if (trimmed.startsWith('DUE:')) {
+          task.dueDate = trimmed.substring(4).trim();
+        }
+      }
+
+      if (task.id && task.name !== undefined) {
+        tasks.push(task);
+      }
+    }
+
+    return tasks;
   }
 
   // Parse task detail output
   parseTaskDetail(output) {
-    if (!output || output === '') {
+    if (!output || output.trim() === '') {
       throw new Error('Task not found');
     }
-    
-    const parts = output.split('|');
+
+    const lines = output.split('\n');
     const task = {};
-    
-    parts.forEach(part => {
-      const [key, value] = part.split(':', 2);
-      if (key && value !== undefined) {
-        if (key === 'COMPLETED') {
-          task.completed = value === 'true';
-        } else if (key === 'ID') {
-          task.id = value;
-        } else if (key === 'NAME') {
-          task.name = value;
-        } else if (key === 'NOTES') {
-          task.notes = value;
-        } else if (key === 'DUE') {
-          task.dueDate = value;
-        }
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('ID:')) {
+        task.id = trimmed.substring(3).trim();
+      } else if (trimmed.startsWith('NAME:')) {
+        task.name = trimmed.substring(5).trim();
+      } else if (trimmed.startsWith('COMPLETED:')) {
+        task.completed = trimmed.substring(10).trim() === 'true';
+      } else if (trimmed.startsWith('NOTES:')) {
+        task.notes = trimmed.substring(6).trim();
+      } else if (trimmed.startsWith('DUE:')) {
+        task.dueDate = trimmed.substring(4).trim();
+      } else if (trimmed.startsWith('CREATED:')) {
+        task.createdDate = trimmed.substring(8).trim();
       }
-    });
-    
+    }
+
     return task;
   }
 }
