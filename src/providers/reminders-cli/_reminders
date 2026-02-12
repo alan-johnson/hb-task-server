@@ -1,0 +1,217 @@
+#compdef reminders
+local context state state_descr line
+_reminders_commandname=$words[1]
+typeset -A opt_args
+
+_reminders() {
+    integer ret=1
+    local -a args
+    args+=(
+        '(-h --help)'{-h,--help}'[Show help information.]'
+        '(-): :->command'
+        '(-)*:: :->arg'
+    )
+    _arguments -w -s -S $args[@] && ret=0
+    case $state in
+        (command)
+            local subcommands
+            subcommands=(
+                'add:Add a reminder to a list'
+                'complete:Complete a reminder'
+                'uncomplete:Uncomplete a reminder'
+                'delete:Delete a reminder'
+                'edit:Edit the text of a reminder'
+                'show:Print the items on the given list'
+                'show-lists:Print the name of lists to pass to other commands'
+                'new-list:Create a new list'
+                'show-all:Print all reminders'
+                'help:Show subcommand help information.'
+            )
+            _describe "subcommand" subcommands
+            ;;
+        (arg)
+            case ${words[1]} in
+                (add)
+                    _reminders_add
+                    ;;
+                (complete)
+                    _reminders_complete
+                    ;;
+                (uncomplete)
+                    _reminders_uncomplete
+                    ;;
+                (delete)
+                    _reminders_delete
+                    ;;
+                (edit)
+                    _reminders_edit
+                    ;;
+                (show)
+                    _reminders_show
+                    ;;
+                (show-lists)
+                    _reminders_show-lists
+                    ;;
+                (new-list)
+                    _reminders_new-list
+                    ;;
+                (show-all)
+                    _reminders_show-all
+                    ;;
+                (help)
+                    _reminders_help
+                    ;;
+            esac
+            ;;
+    esac
+
+    return ret
+}
+
+_reminders_add() {
+    integer ret=1
+    local -a args
+    args+=(
+        ':list-name:{_custom_completion $_reminders_commandname ---completion add -- listName $words}'
+        ':reminder:'
+        '(--due-date -d)'{--due-date,-d}'[The date the reminder is due]:due-date:'
+        '(--priority -p)'{--priority,-p}'[The priority of the reminder]:priority:'
+        '(--format -f)'{--format,-f}'[format, either of '"'"'plain'"'"' or '"'"'json'"'"']:format:'
+        '(--notes -n)'{--notes,-n}'[The notes to add to the reminder]:notes:'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S $args[@] && ret=0
+
+    return ret
+}
+
+_reminders_complete() {
+    integer ret=1
+    local -a args
+    args+=(
+        ':list-name:{_custom_completion $_reminders_commandname ---completion complete -- listName $words}'
+        ':index:'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S $args[@] && ret=0
+
+    return ret
+}
+
+_reminders_uncomplete() {
+    integer ret=1
+    local -a args
+    args+=(
+        ':list-name:{_custom_completion $_reminders_commandname ---completion uncomplete -- listName $words}'
+        ':index:'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S $args[@] && ret=0
+
+    return ret
+}
+
+_reminders_delete() {
+    integer ret=1
+    local -a args
+    args+=(
+        ':list-name:{_custom_completion $_reminders_commandname ---completion delete -- listName $words}'
+        ':index:'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S $args[@] && ret=0
+
+    return ret
+}
+
+_reminders_edit() {
+    integer ret=1
+    local -a args
+    args+=(
+        ':list-name:{_custom_completion $_reminders_commandname ---completion edit -- listName $words}'
+        ':index:'
+        '(--notes -n)'{--notes,-n}'[The notes to set on the reminder, overwriting previous notes]:notes:'
+        ':reminder:'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S $args[@] && ret=0
+
+    return ret
+}
+
+_reminders_show() {
+    integer ret=1
+    local -a args
+    args+=(
+        ':list-name:{_custom_completion $_reminders_commandname ---completion show -- listName $words}'
+        '--only-completed[Show completed items only]'
+        '--include-completed[Include completed items in output]'
+        '(--sort -s)'{--sort,-s}'[Show the reminders in a specific order, one of: none, creation-date, due-date]:sort:(none creation-date due-date)'
+        '(-o --sort-order)'{-o,--sort-order}'[How the sort order should be applied, one of: ascending, descending]:sort-order:(ascending descending)'
+        '(--due-date -d)'{--due-date,-d}'[Show only reminders due on this date]:due-date:'
+        '(--format -f)'{--format,-f}'[format, either of '"'"'plain'"'"' or '"'"'json'"'"']:format:'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S $args[@] && ret=0
+
+    return ret
+}
+
+_reminders_show-lists() {
+    integer ret=1
+    local -a args
+    args+=(
+        '(--format -f)'{--format,-f}'[format, either of '"'"'plain'"'"' or '"'"'json'"'"']:format:'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S $args[@] && ret=0
+
+    return ret
+}
+
+_reminders_new-list() {
+    integer ret=1
+    local -a args
+    args+=(
+        ':list-name:'
+        '(--source -s)'{--source,-s}'[The name of the source of the list, if all your lists use the same source it will default to that]:source:'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S $args[@] && ret=0
+
+    return ret
+}
+
+_reminders_show-all() {
+    integer ret=1
+    local -a args
+    args+=(
+        '--only-completed[Show completed items only]'
+        '--include-completed[Include completed items in output]'
+        '(--due-date -d)'{--due-date,-d}'[Show only reminders due on this date]:due-date:'
+        '(--format -f)'{--format,-f}'[format, either of '"'"'plain'"'"' or '"'"'json'"'"']:format:'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S $args[@] && ret=0
+
+    return ret
+}
+
+_reminders_help() {
+    integer ret=1
+    local -a args
+    args+=(
+        ':subcommands:'
+    )
+    _arguments -w -s -S $args[@] && ret=0
+
+    return ret
+}
+
+
+_custom_completion() {
+    local completions=("${(@f)$($*)}")
+    _describe '' completions
+}
+
+_reminders
