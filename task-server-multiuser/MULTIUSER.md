@@ -4,11 +4,11 @@ This guide explains how to run the task server in multi-user mode with authentic
 
 ## Overview
 
-In multi-user mode:
-- ✅ Each user has their own account with username/password
-- ✅ Users can only access their own tasks (complete isolation)
-- ✅ JWT-based authentication
-- ✅ Each user can connect their own Microsoft/Google accounts
+In multi-user mode:  
+- ✅ Each user has their own account with username/password  
+- ✅ Users can only access their own tasks (complete isolation)  
+- ✅ JWT-based authentication  
+- ✅ Each user can connect their own Microsoft/Google accounts  
 - ✅ For Apple Reminders, each user accesses their own local Reminders app
 
 ## Setup
