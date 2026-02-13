@@ -1,6 +1,6 @@
 # Handsbreadth Task Server
 
-A REST API server that connects with Apple Reminders, Microsoft Tasks, and Google Tasks, providing task management across all three platforms. It is the server to the Pebble Claude Reminders watch application.
+A REST API server that connects with Apple Reminders, Microsoft Tasks, and Google Tasks, providing task management across all three platforms. It is the server to the Handsbreadth hb-reminders Pebble watch application.
 
 ## Features
 
