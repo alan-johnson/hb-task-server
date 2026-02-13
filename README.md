@@ -1,4 +1,4 @@
-# Unified Task Server
+# Handsbreadth Unified Task Server
 
 A REST API server that integrates with Apple Reminders, Microsoft Tasks, and Google Tasks, providing a unified interface for task management across all three platforms.
 
@@ -26,7 +26,7 @@ A REST API server that integrates with Apple Reminders, Microsoft Tasks, and Goo
 
 1. **Clone or download the project**
    ```bash
-   cd claude-task-server
+   cd hb-task-server
    ```
 
 2. **Install dependencies**
