@@ -1,3 +1,9 @@
+/**
+ * Handsbreadth Task Server
+ * Copyright (c) 2026 Handsbreadth Software LLC.
+ * All rights reserved.
+ */
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
