@@ -1,3 +1,9 @@
+/**
+ * Handsbreadth Task Server
+ * Copyright (c) 2026 Handsbreadth Software LLC.
+ * All rights reserved.
+ */
+
 const { execSync } = require('child_process');
 const path = require('path');
 
