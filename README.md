@@ -1,4 +1,4 @@
-# Handsbreadth Task Server
+# hb-task-server™ - Handsbreadth™ Task Server
 
 A REST API server that connects with Apple Reminders, Microsoft Tasks, and Google Tasks, providing task management across all three platforms. It is the server to the Handsbreadth hb-reminders Pebble watch application.
 
@@ -324,7 +324,7 @@ hb-task-server/
 
 ## Security Considerations
 
-- This is a personal server.
+This is a personal server. We advise not to expose the hb-task-server™ to the internet which could put your information at risk.
 
 ## License
 
