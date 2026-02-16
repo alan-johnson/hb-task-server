@@ -6,9 +6,7 @@ A REST API server that connects with Apple Reminders, Microsoft Tasks, and Googl
 
 - ✅ **Apple Reminders** - Native integration via AppleScript (no authentication needed)
 - ✅ **Reminders CLI** - Alternative Apple Reminders integration via command-line tool (no authentication needed)
-- ✅ **Microsoft Tasks** - Integration via Microsoft Graph API
-- ✅ **Google Tasks** - Integration via Google Tasks API
-- ✅ Unified REST API for all providers
+- ✅ Unified REST API for any future providers
 - ✅ Get task lists
 - ✅ Get tasks within a list
 - ✅ Get task details
