@@ -64,7 +64,7 @@ An alternative provider for Apple Reminders that uses a command-line interface i
 
 3. Grant permissions when prompted (System Settings > Privacy & Security > Automation)
 
-For detailed documentation, see [src/providers/reminders-cli/README.md](src/providers/reminders-cli/README.md)
+For detailed **reminders-cli** documentation, see [src/providers/reminders-cli/README.md](src/providers/reminders-cli/README.md)
 
 ## Running the Server
 
