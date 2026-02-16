@@ -10,8 +10,6 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const AppleRemindersProvider = require('./providers/apple/apple');
-const MicrosoftTasksProvider = require('./providers/microsoft/microsoft');
-const GoogleTasksProvider = require('./providers/google/google');
 const RemindersCliProvider = require('./providers/reminders-cli/reminders-cli');
 
 const app = express();
@@ -24,18 +22,7 @@ app.use(bodyParser.json());
 // Provider instances
 const providers = {
   apple: new AppleRemindersProvider(),
-  microsoft: new MicrosoftTasksProvider({
-    clientId: process.env.MICROSOFT_CLIENT_ID,
-    clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
-    tenantId: process.env.MICROSOFT_TENANT_ID,
-    redirectUri: process.env.MICROSOFT_REDIRECT_URI
-  }),
-  google: new GoogleTasksProvider({
-    clientId: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    redirectUri: process.env.GOOGLE_REDIRECT_URI
-  }),
-  'reminders-cli': new RemindersCliProvider()
+ 'reminders-cli': new RemindersCliProvider()
 };
 
 // Session storage for tokens (in production, use a proper session store)
@@ -299,13 +286,9 @@ app.listen(PORT, () => {
   console.log('\nAvailable endpoints:');
   console.log('  GET  /health');
   console.log('  GET  /api/providers');
-  console.log('  GET  /api/lists?provider=apple|microsoft|google');
+  console.log('  GET  /api/lists?provider=reminders-cli|apple');
   console.log('  GET  /api/lists/:listId/tasks');
   console.log('  GET  /api/lists/:listId/tasks/:taskId');
   console.log('  POST /api/lists/:listId/tasks');
   console.log('  PATCH /api/lists/:listId/tasks/:taskId/complete');
-  console.log('\nAuthentication:');
-  console.log('  GET  /auth/google/url');
-  console.log('  GET  /auth/google/callback');
-  console.log('  POST /auth/microsoft/token');
 });
