@@ -18,8 +18,6 @@ A REST API server that connects with Apple Reminders, Microsoft Tasks, and Googl
 - **Node.js** (v14 or later)
   - download latest *LTS version* from [Download Node.js](https://nodejs.org/en/download)
 - **macOS** (for Apple Reminders integration)
-- **Microsoft Azure account** (for Microsoft Tasks)
-- **Google Cloud account** (for Google Tasks)
 
 ## Installation
 
