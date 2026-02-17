@@ -4,7 +4,11 @@
  * All rights reserved.
  */
 
-require('dotenv').config();
+const path = require('path');
+const envPath = process.pkg
+  ? path.join(path.dirname(process.execPath), '.env')
+  : path.join(__dirname, '..', '.env');
+require('dotenv').config({ path: envPath });
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
