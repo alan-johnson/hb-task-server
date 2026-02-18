@@ -248,7 +248,7 @@ To add support for additional CLI commands:
 
 ## License
 
-This provider is part of the Handsbreadth hb-reminders project.
+This provider is part of the Handsbreadth™ hb-reminders™ and hb-task-server™ projects.
 
 ## Credits
 
