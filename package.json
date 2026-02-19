@@ -12,9 +12,7 @@
   },
   "pkg": {
     "entry": "src/server.js",
-    "assets": [
-      "src/**/*"
-    ]
+    "assets": []
   },
   "dependencies": {
     "@azure/identity": "^4.0.0",

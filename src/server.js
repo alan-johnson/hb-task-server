@@ -5,16 +5,15 @@
  */
 
 const path = require('path');
-const envPath = process.pkg
-  ? path.join(path.dirname(process.execPath), '.env')
-  : path.join(__dirname, '..', '.env');
-require('dotenv').config({ path: envPath });
+const baseDir = path.dirname(process.execPath);
+require('dotenv').config({ path: path.join(baseDir, '.env') });
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const AppleRemindersProvider = require('./providers/apple/apple');
-const RemindersCliProvider = require('./providers/reminders-cli/reminders-cli');
+const AppleRemindersProvider = require(path.join(baseDir, 'providers/apple/apple'));
+const RemindersCliProvider = require(path.join(baseDir, 'providers/reminders-cli/reminders-cli'));
 
 const app = express();
 const PORT = process.env.PORT || 3000;
