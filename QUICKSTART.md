@@ -1,129 +1,101 @@
-# Quick Start Guide
+# hb-task-server Quick Start
 
-## Immediate Testing (Apple Reminders Only)
+## Prerequisites
 
-The fastest way to get started is with Apple Reminders, which requires no API configuration:
+- **macOS** (required for Apple Reminders integration)
 
-### 1. Install Dependencies
+---
+
+## Installation
+
+1. **Download** the latest release from GitHub Releases.
+2. **Create a folder** for the Task Server, then copy the downloaded `.zip` file into it and unzip it.
+3. **Configure** the environment file:
+   ```bash
+   open .env
+   ```
+   Set your preferred port and provider (`apple` or `reminders-cli`):
+   ```
+   PORT=3000
+   DEFAULT_PROVIDER=apple
+   ```
+
+---
+
+## Running the Server
+
+Double-click the **hb-task-server** application:
+
+- `hb-task-server-arm64` — Apple Silicon Macs (M1/M2/M3)
+- `hb-task-server-x64` — Intel Macs
+
+The server starts at `http://localhost:3000` (or the port set in `.env`).
+
+---
+
+## Provider Setup
+
+### Apple Reminders (default)
+
+No setup needed. On the first request, macOS will prompt you to grant Reminders access — click **OK**.
+
+If you accidentally denied it: **System Settings → Privacy & Security → Automation** and enable access for your Terminal app.
+
+### Reminders CLI (alternative)
+
+Faster than AppleScript and useful if you have AppleScript permission issues.
+
+1. Open Terminal and navigate to the provider folder:
+   ```bash
+   cd <folder where you unzipped>/providers/reminders-cli
+   ```
+2. Verify access and grant permissions:
+   ```bash
+   reminders show-lists
+   ```
+
+---
+
+## Quick API Test
+
 ```bash
-cd task-server-local
-npm install
-```
-
-### 2. Create Environment File
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and set:
-```
-PORT=3000
-DEFAULT_PROVIDER=apple
-```
-
-### 3. Start the Server
-```bash
-npm start
-```
-
-### 4. Test the API
-
-Open a new terminal and run:
-
-```bash
-# Get all your Reminders lists
+# Get all task lists
 curl http://localhost:3000/api/lists?provider=apple
 
-# Get tasks from a specific list (replace LIST_ID with actual ID from above)
+# Get tasks from a list (use an ID returned above)
 curl "http://localhost:3000/api/lists/LIST_ID/tasks?provider=apple"
 
-# Create a new task
+# Create a task
 curl -X POST "http://localhost:3000/api/lists/LIST_ID/tasks?provider=apple" \
   -H "Content-Type: application/json" \
-  -d '{"name": "Test from API", "notes": "Created via REST API"}'
+  -d '{"name": "Test task", "notes": "Created via API"}'
 
-# Or run the automated test script
-node test-api.js
+# Mark a task complete
+curl -X PATCH "http://localhost:3000/api/lists/LIST_ID/tasks/TASK_ID/complete?provider=apple"
 ```
 
-### 5. Grant Permissions
+---
 
-On the first API call, macOS will prompt you to grant Terminal access to Reminders:
-- Click "OK" to allow access
-- If you accidentally denied it, go to:
-  - System Settings → Privacy & Security → Automation
-  - Enable access for your Terminal app
+## API Endpoints
 
-## Next Steps
-
-### To Add Microsoft Tasks:
-
-1. Follow the Microsoft configuration steps in README.md
-2. Add credentials to `.env`
-3. Use `?provider=microsoft` in API calls
-
-### To Add Google Tasks:
-
-1. Follow the Google configuration steps in README.md  
-2. Add credentials to `.env`
-3. Complete OAuth flow via `/auth/google/url`
-4. Use `?provider=google` in API calls
-
-## Common Commands
-
-```bash
-# Start server
-npm start
-
-# Start with auto-reload (development)
-npm run dev
-
-# Test API
-node test-api.js
-
-# Check server health
-curl http://localhost:3000/health
 ```
-
-## API Endpoints Cheat Sheet
-
-```bash
-# Lists
-GET    /api/lists?provider=apple|microsoft|google
-GET    /api/lists/:listId/tasks
-GET    /api/lists/:listId/tasks/:taskId
-
-# Tasks
-POST   /api/lists/:listId/tasks
-PATCH  /api/lists/:listId/tasks/:taskId/complete
-
-# Auth
-GET    /auth/google/url
-GET    /auth/google/callback
-POST   /auth/microsoft/token
-
-# System
-GET    /health
 GET    /api/providers
+GET    /api/lists?provider=apple|reminders-cli
+GET    /api/lists/:listId/tasks?provider=apple|reminders-cli
+GET    /api/lists/:listId/tasks/:taskId?provider=apple|reminders-cli
+POST   /api/lists/:listId/tasks?provider=apple|reminders-cli
+PATCH  /api/lists/:listId/tasks/:taskId/complete?provider=apple|reminders-cli
 ```
+
+---
 
 ## Troubleshooting
 
-**Port already in use:**
-```bash
-# Change PORT in .env to a different number (e.g., 3001)
-PORT=3001
-```
+| Problem | Solution |
+|---|---|
+| "AppleScript error: Not authorized" | System Settings → Privacy & Security → Automation → enable Terminal |
+| "macOS cannot verify that this app is free from malware" | Run `xattr -d com.apple.quarantine providers/reminders-cli/reminders` |
+| "Permission denied" on reminders binary | Run `chmod +x providers/reminders-cli/reminders` |
+| Port already in use | Change `PORT` in `.env` and restart the server |
 
-**Can't access Reminders:**
-- Check System Settings → Privacy & Security → Automation
-- Make sure Terminal has Reminders access
-
-**Module not found:**
-```bash
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
-```
-
-For more detailed information, see README.md
+For full documentation, see [README.md](README.md).

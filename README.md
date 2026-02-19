@@ -15,28 +15,23 @@ A REST API server that connects with Apple Reminders, Microsoft Tasks, and Googl
 
 ## Prerequisites
 
-- **Node.js** (v14 or later)
-  - download latest *LTS version* from [Download Node.js](https://nodejs.org/en/download)
 - **macOS** (for Apple Reminders integration)
 
 ## Installation
 
-1. **Clone or download the project**
+1. **Download from the GitHub Releases**
    ```bash
    cd hb-task-server
    ```
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+2. **Create a new folder** for the Task Server then copy the downloaded .zip file to the new folder.
 
 3. **Configure environment variables**
    ```bash
-   cp .env.example .env
+   open .env
    ```
    
-   Edit `.env` and add your credentials (see Configuration section below).
+   Edit `.env` for your port and preferred provider (either `apple` using AppleScript or `reminders-cli`)
 
 ## Configuration
 
@@ -44,38 +39,27 @@ A REST API server that connects with Apple Reminders, Microsoft Tasks, and Googl
 
 No configuration needed! Apple Reminders works out of the box on macOS using AppleScript.
 
-The first time you run the server, macOS may prompt you to grant Terminal (or your terminal app) access to Reminders. Click "OK" to allow access.
+The first time you run the server, macOS may prompt you to grant access to Reminders. Click "OK" to allow access.
 
 ### Reminders CLI
 
-An alternative provider for Apple Reminders that uses a command-line interface instead of AppleScript. This can be useful if you encounter issues with AppleScript permissions.
+An alternative provider for Apple Reminders that uses a command-line interface instead of AppleScript. This can be useful if you encounter issues with AppleScript permissions and is faster.
 
 **Setup:**
 
-1. Remove the macOS quarantine attribute from the executable:
+1. Open the Terminal application then change the directory to the `providers` directory where you unzipped the **hb-task-server** files.
    ```bash
-   xattr -d com.apple.quarantine src/providers/reminders-cli/reminders
+   cd <folder where you unzipped the files>/providers/reminders-cli
    ```
 
-2. Verify it works:
+2. Verify it works and permit access to Apple Reminders:
    ```bash
-   src/providers/reminders-cli/reminders show-lists
+   reminders show-lists
    ```
-
-3. Grant permissions when prompted (System Settings > Privacy & Security > Automation)
-
-For detailed **reminders-cli** documentation, see [src/providers/reminders-cli/README.md](src/providers/reminders-cli/README.md)
 
 ## Running the Server
 
-```bash
-npm start
-```
-
-For development with auto-reload:
-```bash
-npm run dev
-```
+Double-click on the hb-task-server application. This would be `hb-task-server-arm64` for new Macs with Apple Silicon CPUs or `hb-task-server-x64` for older Macs with Intel CPUs.
 
 The server will start on `http://localhost:3000` (or the port specified in your .env file).
 
