@@ -6,12 +6,19 @@
 
 const { execSync } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 class RemindersCliProvider {
   constructor() {
     this.name = 'Reminders CLI';
-    // Path to the reminders executable (now in same directory)
-    this.cliPath = path.join(__dirname, 'reminders');
+    // The reminders binary lives at providers/reminders-cli/reminders
+    // relative to the running executable (SEA binary or node process).
+    // esbuild rewrites __dirname to the bundle location, so we resolve
+    // relative to the executable directory in all cases.
+    const execDir = path.dirname(process.execPath);
+    const seaPath = path.join(execDir, 'providers', 'reminders-cli', 'reminders');
+    const devPath = path.join(__dirname, 'reminders');
+    this.cliPath = fs.existsSync(seaPath) ? seaPath : devPath;
     // Cache list names to IDs mapping (CLI uses names, API uses IDs)
     this.listNameToId = {};
     this.listIdToName = {};
@@ -148,10 +155,9 @@ class RemindersCliProvider {
 
     args += ' --format json';
 
-    const output = this.executeCommand(args);
+    this.executeCommand(args);
 
-    // The CLI might return the created task info or just success
-    // Return a basic response
+    // The CLI doesn't return usable task info on create
     return {
       id: 'pending', // CLI doesn't return ID immediately
       name: title
