@@ -1,9 +1,3 @@
-/**
- * Handsbreadth Task Server
- * Copyright (c) 2026 Handsbreadth Software LLC.
- * All rights reserved.
- */
-
 const { Client } = require('@microsoft/microsoft-graph-client');
 const { ClientSecretCredential } = require('@azure/identity');
 
