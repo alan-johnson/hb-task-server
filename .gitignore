@@ -27,5 +27,20 @@ coverage/
 dist/
 build/
 
-# Bundle
-*.app
+# Enterprise version: macOS-only providers (require AppleScript / local macOS binary)
+src/providers/apple/
+src/providers/reminders-cli/
+
+# Enterprise version: local-run artifacts and app bundles
+hb-task-server.app
+task-server.tar
+
+# Enterprise version: local development / manual testing scripts
+test-api.js
+
+# Enterprise version: prototype reference directories (not part of running app)
+task-server-cloud/
+task-server-multiuser/
+
+# Accidental directory
+{src,config,scripts}/

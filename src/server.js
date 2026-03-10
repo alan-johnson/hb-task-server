@@ -4,16 +4,13 @@
  * All rights reserved.
  */
 
-const path = require('path');
-const baseDir = path.dirname(process.execPath);
-require('dotenv').config({ path: path.join(baseDir, '.env') });
-
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const AppleRemindersProvider = require(path.join(baseDir, 'providers/apple/apple'));
-const RemindersCliProvider = require(path.join(baseDir, 'providers/reminders-cli/reminders-cli'));
+const AppleRemindersProvider = require('./providers/apple/apple');
+const RemindersCliProvider = require('./providers/reminders-cli/reminders-cli');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,61 +22,19 @@ app.use(bodyParser.json());
 // Provider instances
 const providers = {
   apple: new AppleRemindersProvider(),
- 'reminders-cli': new RemindersCliProvider()
+  'reminders-cli': new RemindersCliProvider()
 };
-
-// Session storage for tokens (in production, use a proper session store)
-const sessions = new Map();
 
 // Helper to get provider
 function getProvider(req) {
   const providerName = req.query.provider || req.body.provider || process.env.DEFAULT_PROVIDER || 'apple';
   const provider = providers[providerName.toLowerCase()];
-  
+
   if (!provider) {
     throw new Error(`Invalid provider: ${providerName}`);
   }
-  
-  return { provider, providerName };
-}
 
-// Initialize provider with auth if needed
-async function initializeProvider(provider, providerName, req) {
-  if (providerName === 'apple' || providerName === 'reminders-cli') {
-    // Apple Reminders and Reminders CLI don't need initialization
-    return;
-  }
-  
-  const sessionId = req.headers['x-session-id'];
-  const authHeader = req.headers['authorization'];
-  
-  if (providerName === 'microsoft') {
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const accessToken = authHeader.substring(7);
-      await provider.initialize(accessToken);
-    } else if (sessionId && sessions.has(sessionId)) {
-      const session = sessions.get(sessionId);
-      if (session.microsoft) {
-        await provider.initialize(session.microsoft.accessToken);
-      }
-    } else {
-      await provider.initialize(); // Try client credentials
-    }
-  } else if (providerName === 'google') {
-    if (sessionId && sessions.has(sessionId)) {
-      const session = sessions.get(sessionId);
-      if (session.google) {
-        await provider.initialize(session.google.accessToken, session.google.refreshToken);
-      } else {
-        throw new Error('Google Tasks requires authentication');
-      }
-    } else if (authHeader && authHeader.startsWith('Bearer ')) {
-      const accessToken = authHeader.substring(7);
-      await provider.initialize(accessToken);
-    } else {
-      throw new Error('Google Tasks requires authentication');
-    }
-  }
+  return { provider, providerName };
 }
 
 // ============================================
@@ -94,68 +49,9 @@ app.get('/health', (req, res) => {
 // Get available providers
 app.get('/api/providers', (req, res) => {
   res.json({
-    providers: ['apple', 'microsoft', 'google', 'reminders-cli'],
+    providers: ['apple', 'reminders-cli'],
     default: process.env.DEFAULT_PROVIDER || 'apple'
   });
-});
-
-// ============================================
-// Authentication Routes
-// ============================================
-
-// Google OAuth - Get auth URL
-app.get('/auth/google/url', (req, res) => {
-  try {
-    const authUrl = providers.google.getAuthUrl();
-    res.json({ authUrl });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Google OAuth - Callback
-app.get('/auth/google/callback', async (req, res) => {
-  try {
-    const { code } = req.query;
-    const tokens = await providers.google.getTokensFromCode(code);
-    
-    // Create session
-    const sessionId = Date.now().toString() + Math.random().toString(36);
-    sessions.set(sessionId, {
-      google: {
-        accessToken: tokens.access_token,
-        refreshToken: tokens.refresh_token
-      }
-    });
-    
-    res.json({ 
-      success: true, 
-      sessionId,
-      message: 'Authentication successful. Use this session ID in X-Session-ID header for subsequent requests.'
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Microsoft OAuth - Set token (simplified - in production implement full OAuth flow)
-app.post('/auth/microsoft/token', (req, res) => {
-  try {
-    const { accessToken } = req.body;
-    
-    const sessionId = Date.now().toString() + Math.random().toString(36);
-    sessions.set(sessionId, {
-      microsoft: { accessToken }
-    });
-    
-    res.json({ 
-      success: true, 
-      sessionId,
-      message: 'Token stored. Use this session ID in X-Session-ID header for subsequent requests.'
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
 });
 
 // ============================================
@@ -166,8 +62,6 @@ app.post('/auth/microsoft/token', (req, res) => {
 app.get('/api/lists', async (req, res) => {
   try {
     const { provider, providerName } = getProvider(req);
-    await initializeProvider(provider, providerName, req);
-    
     const lists = await provider.getLists();
     res.json({
       provider: providerName,
@@ -187,7 +81,6 @@ app.get('/api/lists/:listId/tasks', async (req, res) => {
   try {
     const { listId } = req.params;
     const { provider, providerName } = getProvider(req);
-    await initializeProvider(provider, providerName, req);
 
     // Get query parameters for filtering
     const options = {
@@ -215,8 +108,6 @@ app.get('/api/lists/:listId/tasks/:taskId', async (req, res) => {
   try {
     const { listId, taskId } = req.params;
     const { provider, providerName } = getProvider(req);
-    await initializeProvider(provider, providerName, req);
-    
     const task = await provider.getTask(listId, taskId);
     res.json({
       provider: providerName,
@@ -234,8 +125,6 @@ app.post('/api/lists/:listId/tasks', async (req, res) => {
     const { listId } = req.params;
     const taskData = req.body;
     const { provider, providerName } = getProvider(req);
-    await initializeProvider(provider, providerName, req);
-    
     const task = await provider.createTask(listId, taskData);
     res.status(201).json({
       provider: providerName,
@@ -252,8 +141,6 @@ app.patch('/api/lists/:listId/tasks/:taskId/complete', async (req, res) => {
   try {
     const { listId, taskId } = req.params;
     const { provider, providerName } = getProvider(req);
-    await initializeProvider(provider, providerName, req);
-    
     const result = await provider.completeTask(listId, taskId);
     res.json({
       provider: providerName,
@@ -289,7 +176,7 @@ app.listen(PORT, () => {
   console.log('\nAvailable endpoints:');
   console.log('  GET  /health');
   console.log('  GET  /api/providers');
-  console.log('  GET  /api/lists?provider=reminders-cli|apple');
+  console.log('  GET  /api/lists?provider=apple|reminders-cli');
   console.log('  GET  /api/lists/:listId/tasks');
   console.log('  GET  /api/lists/:listId/tasks/:taskId');
   console.log('  POST /api/lists/:listId/tasks');

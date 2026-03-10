@@ -1,30 +1,19 @@
 {
   "name": "hb-task-server",
   "version": "1.0.0",
-  "description": "REST server for Apple Reminders, Microsoft Tasks, and Google Tasks",
+  "description": "Local REST server for Apple Reminders on macOS",
   "main": "src/server.js",
-  "bin": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "build": "pkg . --targets node18-macos-x64,node18-macos-arm64 --output dist/hb-task-server && cp -r src/providers dist/providers && cp .env dist/.env && cd dist && zip -r hb-task-server-arm64.zip hb-task-server-arm64 .env providers && zip -r hb-task-server-x64.zip hb-task-server-x64 .env providers",
-    "release": "npm run build && gh release create v$npm_package_version dist/hb-task-server-arm64.zip dist/hb-task-server-x64.zip --title \"v$npm_package_version\" --generate-notes"
-  },
-  "pkg": {
-    "entry": "src/server.js",
-    "assets": []
+    "dev": "nodemon src/server.js"
   },
   "dependencies": {
-    "@azure/identity": "^4.0.0",
-    "@microsoft/microsoft-graph-client": "^3.0.7",
-    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "googleapis": "^126.0.1"
+    "body-parser": "^1.20.2"
   },
   "devDependencies": {
-    "@yao-pkg/pkg": "^6.14.0",
     "nodemon": "^3.0.1"
   }
 }

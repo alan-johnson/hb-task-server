@@ -1,12 +1,14 @@
-# hb-task-server™ - Handsbreadth™ Task Server
+# Handsbreadth Unified Task Server
 
-A REST API server that connects with Apple Reminders, Microsoft Tasks, and Google Tasks, providing task management across all three platforms. It is the server to the Handsbreadth hb-reminders Pebble watch application.
+A REST API server that integrates with Apple Reminders, Microsoft Tasks, and Google Tasks, providing a unified interface for task management across all three platforms.
 
 ## Features
 
 - ✅ **Apple Reminders** - Native integration via AppleScript (no authentication needed)
 - ✅ **Reminders CLI** - Alternative Apple Reminders integration via command-line tool (no authentication needed)
-- ✅ Unified REST API for any future providers
+- ✅ **Microsoft Tasks** - Integration via Microsoft Graph API
+- ✅ **Google Tasks** - Integration via Google Tasks API
+- ✅ Unified REST API for all providers
 - ✅ Get task lists
 - ✅ Get tasks within a list
 - ✅ Get task details
@@ -15,23 +17,29 @@ A REST API server that connects with Apple Reminders, Microsoft Tasks, and Googl
 
 ## Prerequisites
 
+- **Node.js** (v14 or later)
 - **macOS** (for Apple Reminders integration)
+- **Microsoft Azure account** (for Microsoft Tasks)
+- **Google Cloud account** (for Google Tasks)
 
 ## Installation
 
-1. **Download from the GitHub Releases**
+1. **Clone or download the project**
    ```bash
    cd hb-task-server
    ```
 
-2. **Create a new folder** for the Task Server then copy the downloaded .zip file to the new folder.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
 3. **Configure environment variables**
    ```bash
-   open .env
+   cp .env.example .env
    ```
    
-   Edit `.env` for your port and preferred provider (either `apple` using AppleScript or `reminders-cli`)
+   Edit `.env` and add your credentials (see Configuration section below).
 
 ## Configuration
 
@@ -39,27 +47,90 @@ A REST API server that connects with Apple Reminders, Microsoft Tasks, and Googl
 
 No configuration needed! Apple Reminders works out of the box on macOS using AppleScript.
 
-The first time you run the server, macOS may prompt you to grant access to Reminders. Click "OK" to allow access.
+The first time you run the server, macOS may prompt you to grant Terminal (or your terminal app) access to Reminders. Click "OK" to allow access.
 
 ### Reminders CLI
 
-An alternative provider for Apple Reminders that uses a command-line interface instead of AppleScript. This can be useful if you encounter issues with AppleScript permissions and is faster.
+An alternative provider for Apple Reminders that uses a command-line interface instead of AppleScript. This can be useful if you encounter issues with AppleScript permissions.
 
 **Setup:**
 
-1. Open the Terminal application then change the directory to the `providers` directory where you unzipped the **hb-task-server** files.
+1. Remove the macOS quarantine attribute from the executable:
    ```bash
-   cd <folder where you unzipped the files>/providers/reminders-cli
+   xattr -d com.apple.quarantine src/providers/reminders-cli/reminders
    ```
 
-2. Verify it works and permit access to Apple Reminders:
+2. Verify it works:
    ```bash
-   reminders show-lists
+   src/providers/reminders-cli/reminders show-lists
+   ```
+
+3. Grant permissions when prompted (System Settings > Privacy & Security > Automation)
+
+For detailed documentation, see [src/providers/reminders-cli/README.md](src/providers/reminders-cli/README.md)
+
+### Microsoft Tasks
+
+1. **Register an application in Azure AD:**
+   - Go to [Azure Portal](https://portal.azure.com)
+   - Navigate to "Azure Active Directory" > "App registrations"
+   - Click "New registration"
+   - Name: "Task Server"
+   - Redirect URI: `http://localhost:3000/auth/microsoft/callback`
+   - Click "Register"
+
+2. **Configure API permissions:**
+   - Go to "API permissions"
+   - Add permission > Microsoft Graph > Delegated permissions
+   - Select: `Tasks.ReadWrite`
+   - Grant admin consent
+
+3. **Create a client secret:**
+   - Go to "Certificates & secrets"
+   - Click "New client secret"
+   - Copy the value immediately (you won't be able to see it again)
+
+4. **Update .env file:**
+   ```
+   MICROSOFT_CLIENT_ID=<your_application_id>
+   MICROSOFT_CLIENT_SECRET=<your_client_secret>
+   MICROSOFT_TENANT_ID=<your_tenant_id>
+   ```
+
+### Google Tasks
+
+1. **Create a project in Google Cloud Console:**
+   - Go to [Google Cloud Console](https://console.cloud.google.com)
+   - Create a new project or select an existing one
+
+2. **Enable Google Tasks API:**
+   - Navigate to "APIs & Services" > "Library"
+   - Search for "Google Tasks API"
+   - Click "Enable"
+
+3. **Create OAuth 2.0 credentials:**
+   - Go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth client ID"
+   - Application type: "Web application"
+   - Authorized redirect URIs: `http://localhost:3000/auth/google/callback`
+   - Click "Create"
+
+4. **Update .env file:**
+   ```
+   GOOGLE_CLIENT_ID=<your_client_id>
+   GOOGLE_CLIENT_SECRET=<your_client_secret>
    ```
 
 ## Running the Server
 
-Double-click on the hb-task-server application. This would be `hb-task-server-arm64` for new Macs with Apple Silicon CPUs or `hb-task-server-x64` for older Macs with Intel CPUs.
+```bash
+npm start
+```
+
+For development with auto-reload:
+```bash
+npm run dev
+```
 
 The server will start on `http://localhost:3000` (or the port specified in your .env file).
 
@@ -70,9 +141,39 @@ The server will start on `http://localhost:3000` (or the port specified in your 
 #### Apple Reminders & Reminders CLI
 No authentication required. Both work automatically on macOS.
 
+#### Google Tasks
+1. Get the authorization URL:
+   ```bash
+   curl http://localhost:3000/auth/google/url
+   ```
+
+2. Open the URL in a browser and authorize the application
+
+3. You'll be redirected to the callback URL with a session ID
+
+4. Use the session ID in subsequent requests:
+   ```bash
+   curl -H "X-Session-ID: <session_id>" http://localhost:3000/api/lists?provider=google
+   ```
+
+#### Microsoft Tasks
+1. Obtain an access token using your preferred OAuth flow
+
+2. Store the token:
+   ```bash
+   curl -X POST http://localhost:3000/auth/microsoft/token \
+     -H "Content-Type: application/json" \
+     -d '{"accessToken": "<your_token>"}'
+   ```
+
+3. Use the session ID in subsequent requests:
+   ```bash
+   curl -H "X-Session-ID: <session_id>" http://localhost:3000/api/lists?provider=microsoft
+   ```
+
 ### Endpoints
 
-All endpoints support a `provider` query parameter: `?provider=apple` or `?provider=reminders-cli`
+All endpoints support a `provider` query parameter: `?provider=apple`, `?provider=reminders-cli`, `?provider=microsoft`, or `?provider=google`
 
 #### Get Available Providers
 ```bash
@@ -84,23 +185,12 @@ GET /api/providers
 GET /api/lists?provider=apple
 
 # Examples:
-curl http://localhost:3000/api/lists?provider=reminders-cli
 curl http://localhost:3000/api/lists?provider=apple
-```
-Response - reminders-cli provider:
-```json
-{
-  "provider":"reminders-cli",
-  "lists":[
-    {
-      "id": "Tasks",
-      "name": "Tasks"
-    }
-  ]
-}
+curl http://localhost:3000/api/lists?provider=microsoft -H "X-Session-ID: <session_id>"
+curl http://localhost:3000/api/lists?provider=google -H "X-Session-ID: <session_id>"
 ```
 
-Response - apple provider:
+Response:
 ```json
 {
   "provider": "apple",
@@ -120,35 +210,12 @@ Response - apple provider:
 #### Get Tasks in a List
 ```bash
 GET /api/lists/:listId/tasks?provider=apple
-GET /api/lists/:listId/tasks?provider=reminders-cli
 
 # Example:
 curl "http://localhost:3000/api/lists/x-apple-reminder://ABC123/tasks?provider=apple"
 ```
-Response - reminders-cli provider:
-```json
-{
-  "provider":"reminders-cli",
-  "listId":"PersonalExample",
-  "count":1,
-  "limit":50,
-  "showCompleted":false,
-  "tasks":
-  [
-    {
-      "id": "93C41131-E8B1-4762-9E8F-FB4918C78AB3",
-      "name": "Condo window dimensions",
-      "completed": false,
-      "notes": "This is a notes example. Max 255 characters",
-      "dueDate": null,
-      "priority": 5,
-      "index": 0
-    }
-  ]
-}
-```
 
-Response - apple provider:
+Response:
 ```json
 {
   "provider": "apple",
@@ -167,11 +234,9 @@ Response - apple provider:
 
 #### Get Task Details
 ```bash
-GET /api/lists/:listId/tasks/:taskId?provider=reminders-cli
 GET /api/lists/:listId/tasks/:taskId?provider=apple
 
 # Example:
-curl "http://localhost:3000/api/lists/Personal/tasks/93C41131-E8B1-4762-9E8F-FB4918C78AB3?provider=reminders-cli"
 curl "http://localhost:3000/api/lists/x-apple-reminder://ABC123/tasks/x-apple-reminder://ABC123/DEF456?provider=apple"
 ```
 
@@ -225,6 +290,17 @@ curl http://localhost:3000/api/lists?provider=apple
 # Get all lists using the reminders CLI
 curl http://localhost:3000/api/lists?provider=reminders-cli
 
+# Get tasks from Microsoft Tasks (with authentication)
+curl -H "X-Session-ID: xyz123" \
+  http://localhost:3000/api/lists/AAMkAD.../tasks?provider=microsoft
+
+# Create a task in Google Tasks
+curl -X POST \
+  -H "X-Session-ID: abc789" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Review PR", "notes": "Check the new feature branch"}' \
+  http://localhost:3000/api/lists/MTIzNDU2Nzg5/tasks?provider=google
+
 # Complete a task using reminders CLI
 curl -X PATCH \
   "http://localhost:3000/api/lists/Reminders/tasks/51951E24-3DC1-4835-9DEE-E8FEEE440550/complete?provider=reminders-cli"
@@ -234,13 +310,13 @@ curl -X PATCH \
 
 ```javascript
 // Get lists
-const response = await fetch('http://localhost:3000/api/lists?provider=reminders-cli');
+const response = await fetch('http://localhost:3000/api/lists?provider=apple');
 const data = await response.json();
 console.log(data.lists);
 
 // Create a task
 const createTask = await fetch(
-  'http://localhost:3000/api/lists/LIST_ID/tasks?provider=reminders-cli',
+  'http://localhost:3000/api/lists/LIST_ID/tasks?provider=apple',
   {
     method: 'POST',
     headers: {
@@ -256,7 +332,7 @@ const newTask = await createTask.json();
 
 // Mark as complete
 await fetch(
-  `http://localhost:3000/api/lists/LIST_ID/tasks/${newTask.task.id}/complete?provider=reminders-cli`,
+  `http://localhost:3000/api/lists/LIST_ID/tasks/${newTask.task.id}/complete?provider=apple`,
   { method: 'PATCH' }
 );
 ```
@@ -282,21 +358,42 @@ await fetch(
 **Problem:** "Command failed" or "No reminder found"
 - **Solution:** Make sure the list name is correct (case-sensitive) and grant permissions in System Settings > Privacy & Security > Automation
 
+### Microsoft Tasks
+
+**Problem:** "Client not initialized"
+- **Solution:** Make sure you've authenticated and are sending the X-Session-ID header
+
+**Problem:** "Access token expired"
+- **Solution:** Obtain a new access token and update it via `/auth/microsoft/token`
+
+### Google Tasks
+
+**Problem:** "Authentication required"
+- **Solution:** Complete the OAuth flow at `/auth/google/url` first
+
+**Problem:** "Invalid grant"
+- **Solution:** Your authorization code may have expired. Get a new one from `/auth/google/url`
+
 ## Architecture
 
 ```
-hb-task-server/
+task-server/
 ├── src/
 │   ├── server.js                 # Main Express server
 │   └── providers/
 │       ├── apple/
 │       │   ├── apple.js          # Apple Reminders provider (AppleScript)
 │       │   └── README.md         # Apple provider documentation
-│       └── reminders-cli/
-│           ├── reminders-cli.js  # Reminders CLI provider
-│           ├── reminders         # CLI executable
-│           └── README.md         # CLI provider documentation
-│       
+│       ├── reminders-cli/
+│       │   ├── reminders-cli.js  # Reminders CLI provider
+│       │   ├── reminders         # CLI executable
+│       │   └── README.md         # CLI provider documentation
+│       ├── microsoft/
+│       │   ├── microsoft.js      # Microsoft Tasks provider
+│       │   └── README.md         # Microsoft provider documentation
+│       └── google/
+│           ├── google.js         # Google Tasks provider
+│           └── README.md         # Google provider documentation
 ├── package.json
 ├── .env.example
 └── README.md
@@ -304,7 +401,26 @@ hb-task-server/
 
 ## Security Considerations
 
-This is a personal server. We advise not to expose the hb-task-server™ to the internet which could put your information at risk.
+- This is a development server. For production use:
+  - Implement proper session management (Redis, database)
+  - Use HTTPS
+  - Add rate limiting
+  - Implement proper error handling
+  - Add request validation
+  - Store credentials securely (use environment variables or secrets manager)
+  - Implement token refresh logic for Microsoft and Google
+
+## Future Enhancements
+
+- [ ] Update tasks
+- [ ] Delete tasks
+- [ ] Task priorities
+- [ ] Task categories/tags
+- [ ] Subtasks
+- [ ] Recurring tasks
+- [ ] Full OAuth flows for Microsoft
+- [ ] Webhooks for task updates
+- [ ] Batch operations
 
 ## License
 
