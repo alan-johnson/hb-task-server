@@ -89,6 +89,25 @@ PATCH  /api/lists/:listId/tasks/:taskId/complete?provider=apple|reminders-cli
 
 ---
 
+## Connect to UpQ (optional)
+
+If you have an UpQ account and want your Reminders accessible from the UpQ web dashboard:
+
+1. Log in to UpQ and generate a bridge API key:
+   ```
+   POST /auth/bridge/key
+   ```
+2. Add the returned key and your UpQ server address to `.env`:
+   ```
+   BRIDGE_URL=wss://your-upq-domain.com/bridge
+   BRIDGE_API_KEY=<key>
+   ```
+3. Restart the server. It connects to UpQ automatically in the background.
+
+See [README.md](README.md) for full details.
+
+---
+
 ## Troubleshooting
 
 | Problem | Solution |

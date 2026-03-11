@@ -65,6 +65,46 @@ npm start
 |----------|---------|-------------|
 | `PORT` | `3000` | Port the server listens on |
 | `DEFAULT_PROVIDER` | `apple` | Provider used when none is specified in the request (`apple` or `reminders-cli`) |
+| `BRIDGE_URL` | _(unset)_ | WebSocket URL of the UpQ cloud server bridge endpoint (e.g. `wss://your-upq-domain.com/bridge`) |
+| `BRIDGE_API_KEY` | _(unset)_ | API key issued by UpQ for this device. If either bridge variable is unset, the bridge is disabled and the server runs standalone. |
+
+---
+
+## UpQ Bridge (optional)
+
+The UpQ cloud server (`hb-task-server-enterprise`) can reach this local server's Apple Reminders data through a persistent outbound WebSocket connection. Because the local server initiates the connection, no inbound port forwarding or firewall changes are needed.
+
+### Setup
+
+1. Log in to your UpQ account and call:
+   ```
+   POST /auth/bridge/key
+   Authorization: Bearer <your-jwt-token>
+   ```
+   Copy the `apiKey` from the response — it is shown only once.
+
+2. Add to your local `.env`:
+   ```
+   BRIDGE_URL=wss://your-upq-domain.com/bridge
+   BRIDGE_API_KEY=<key from step 1>
+   ```
+
+3. Restart `hb-task-server`. On startup it connects to UpQ automatically. You will see:
+   ```
+   Bridge: connecting to wss://your-upq-domain.com/bridge...
+   Bridge: connected to UpQ server
+   ```
+
+4. In UpQ, set your default provider to `apple` and your Reminders lists will appear.
+
+### How it works
+
+```
+UpQ cloud server  ←──── persistent WebSocket ────  hb-task-server (local)
+  /api/lists?provider=apple                           Apple Reminders (macOS)
+```
+
+UpQ sends JSON-RPC requests over the socket; the local server executes them against Apple Reminders and returns the results. All Reminders data stays on-device — only task content crosses the connection in response to explicit requests.
 
 ---
 
@@ -173,6 +213,9 @@ curl -X PATCH "http://localhost:3000/api/lists/LIST_ID/tasks/TASK_ID/complete"
 | "Permission denied" on reminders binary | `chmod +x providers/reminders-cli/reminders` |
 | Port already in use | Change `PORT` in `.env` and restart |
 | Lists or tasks not appearing | Confirm lists and tasks exist in the Reminders app |
+| "Bridge: authentication failed" | Regenerate the key in UpQ (`POST /auth/bridge/key`) and update `BRIDGE_API_KEY` in `.env` |
+| Bridge connects then immediately disconnects | The API key was revoked in UpQ — regenerate it |
+| Bridge logs "connecting…" repeatedly | UpQ server is unreachable — check `BRIDGE_URL` and network connectivity |
 
 ---
 

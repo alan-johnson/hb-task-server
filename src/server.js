@@ -11,6 +11,7 @@ const bodyParser = require('body-parser');
 
 const AppleRemindersProvider = require('./providers/apple/apple');
 const RemindersCliProvider = require('./providers/reminders-cli/reminders-cli');
+const { startBridge } = require('./bridge');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -171,6 +172,7 @@ app.use((err, req, res, next) => {
 // ============================================
 
 app.listen(PORT, () => {
+  startBridge(providers);
   console.log(`Task Server running on http://localhost:${PORT}`);
   console.log(`Default provider: ${process.env.DEFAULT_PROVIDER || 'apple'}`);
   console.log('\nAvailable endpoints:');
