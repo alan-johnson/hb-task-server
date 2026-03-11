@@ -46,8 +46,17 @@ ok "postject"
 # ── Prepare build directory ───────────────────────────────────────────────────
 
 step "Preparing build directory"
+# Preserve .env if it exists (contains user-configured API keys)
+if [[ -f "$BUILD_DIR/.env" ]]; then
+  cp "$BUILD_DIR/.env" /tmp/.hb-task-server-env-backup
+fi
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
+if [[ -f /tmp/.hb-task-server-env-backup ]]; then
+  cp /tmp/.hb-task-server-env-backup "$BUILD_DIR/.env"
+  rm /tmp/.hb-task-server-env-backup
+  log ".env preserved"
+fi
 ok "build/ ready"
 
 # ── Copy providers ────────────────────────────────────────────────────────────

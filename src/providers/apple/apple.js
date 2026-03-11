@@ -6,18 +6,35 @@
 
 const { execSync } = require('child_process');
 
+const CACHE_TTL_MS = 30_000; // 30 seconds
+
 class AppleRemindersProvider {
   constructor() {
     this.name = 'Apple Reminders';
+    this._cache = new Map();
   }
 
-  // Execute AppleScript and return result
+  // ── Cache helpers ──────────────────────────────────────────────────────────
+
+  _cacheGet(key) {
+    const entry = this._cache.get(key);
+    if (!entry) return null;
+    if (Date.now() > entry.expires) { this._cache.delete(key); return null; }
+    return entry.value;
+  }
+
+  _cacheSet(key, value) {
+    this._cache.set(key, { value, expires: Date.now() + CACHE_TTL_MS });
+  }
+
+  // ── AppleScript execution ──────────────────────────────────────────────────
+
   executeAppleScript(script) {
     try {
       const result = execSync(`osascript -e '${script.replace(/'/g, "'\\''")}'`, {
         encoding: 'utf-8',
         maxBuffer: 10 * 1024 * 1024,
-        timeout: 60000 // 60 second timeout to handle large lists
+        timeout: 60000
       });
       return result.trim();
     } catch (error) {
@@ -28,8 +45,12 @@ class AppleRemindersProvider {
     }
   }
 
-  // Get all task lists
+  // ── Provider methods ───────────────────────────────────────────────────────
+
   async getLists() {
+    const cached = this._cacheGet('lists');
+    if (cached) return cached;
+
     const script = `
       tell application "Reminders"
         set output to ""
@@ -42,258 +63,197 @@ class AppleRemindersProvider {
         return output
       end tell
     `;
-    
+
     const result = this.executeAppleScript(script);
-    return this.parseListsOutput(result);
+    const lists = this.parseListsOutput(result);
+    this._cacheSet('lists', lists);
+    return lists;
   }
 
-  // Get tasks from a specific list
   async getTasks(listId, options = {}) {
-    // Default to showing only incomplete tasks, with a limit of 50
     const showCompleted = options.showCompleted || false;
-    const limit = options.limit || 50;
+    const cacheKey = `tasks:${listId}:${showCompleted}`;
+    const cached = this._cacheGet(cacheKey);
+    if (cached) {
+      const limit = options.limit || 50;
+      return cached.slice(0, limit);
+    }
 
-    // Use 'whose' clause to filter reminders efficiently
+    // Use 'whose id is' to find the list directly — avoids iterating all lists
     const filterClause = showCompleted ? '' : ' whose completed is false';
 
     const script = `
       tell application "Reminders"
         set output to ""
         set taskCount to 0
-        set maxTasks to ${limit}
-
-        repeat with aList in lists
-          if id of aList is "${listId}" then
-            set filteredReminders to reminders of aList${filterClause}
-            repeat with aReminder in filteredReminders
-              set output to output & "TASK_START" & linefeed
-              set output to output & "ID:" & id of aReminder & linefeed
-              set output to output & "NAME:" & name of aReminder & linefeed
-              set output to output & "COMPLETED:" & completed of aReminder & linefeed
-              try
-                if body of aReminder is not missing value then
-                  set output to output & "NOTES:" & body of aReminder & linefeed
-                end if
-              end try
-              try
-                if due date of aReminder is not missing value then
-                  set output to output & "DUE:" & (due date of aReminder as string) & linefeed
-                end if
-              end try
-              set output to output & "TASK_END" & linefeed
-
-              set taskCount to taskCount + 1
-              if taskCount >= maxTasks then
-                exit repeat
-              end if
-            end repeat
-            exit repeat
-          end if
+        set maxTasks to ${options.limit || 50}
+        set targetList to first list whose id is "${listId}"
+        set filteredReminders to reminders of targetList${filterClause}
+        repeat with aReminder in filteredReminders
+          set output to output & "TASK_START" & linefeed
+          set output to output & "ID:" & id of aReminder & linefeed
+          set output to output & "NAME:" & name of aReminder & linefeed
+          set output to output & "COMPLETED:" & completed of aReminder & linefeed
+          try
+            if body of aReminder is not missing value then
+              set output to output & "NOTES:" & body of aReminder & linefeed
+            end if
+          end try
+          try
+            if due date of aReminder is not missing value then
+              set output to output & "DUE:" & (due date of aReminder as string) & linefeed
+            end if
+          end try
+          set output to output & "TASK_END" & linefeed
+          set taskCount to taskCount + 1
+          if taskCount >= maxTasks then exit repeat
         end repeat
         return output
       end tell
     `;
 
     const result = this.executeAppleScript(script);
-    return this.parseTasksOutput(result);
+    const tasks = this.parseTasksOutput(result);
+    this._cacheSet(cacheKey, tasks);
+    return tasks;
   }
 
-  // Get task details
   async getTask(listId, taskId) {
     const script = `
       tell application "Reminders"
+        set targetList to first list whose id is "${listId}"
         set output to ""
-        repeat with aList in lists
-          if id of aList is "${listId}" then
-            repeat with aReminder in reminders of aList
-              if id of aReminder is "${taskId}" then
-                set output to output & "ID:" & id of aReminder & linefeed
-                set output to output & "NAME:" & name of aReminder & linefeed
-                set output to output & "COMPLETED:" & completed of aReminder & linefeed
-                try
-                  if body of aReminder is not missing value then
-                    set output to output & "NOTES:" & body of aReminder & linefeed
-                  end if
-                end try
-                try
-                  if due date of aReminder is not missing value then
-                    set output to output & "DUE:" & (due date of aReminder as string) & linefeed
-                  end if
-                end try
-                try
-                  if creation date of aReminder is not missing value then
-                    set output to output & "CREATED:" & (creation date of aReminder as string) & linefeed
-                  end if
-                end try
-                return output
+        repeat with aReminder in reminders of targetList
+          if id of aReminder is "${taskId}" then
+            set output to output & "ID:" & id of aReminder & linefeed
+            set output to output & "NAME:" & name of aReminder & linefeed
+            set output to output & "COMPLETED:" & completed of aReminder & linefeed
+            try
+              if body of aReminder is not missing value then
+                set output to output & "NOTES:" & body of aReminder & linefeed
               end if
-            end repeat
+            end try
+            try
+              if due date of aReminder is not missing value then
+                set output to output & "DUE:" & (due date of aReminder as string) & linefeed
+              end if
+            end try
+            try
+              if creation date of aReminder is not missing value then
+                set output to output & "CREATED:" & (creation date of aReminder as string) & linefeed
+              end if
+            end try
+            return output
           end if
         end repeat
         return ""
       end tell
     `;
-    
+
     const result = this.executeAppleScript(script);
-    if (!result) {
-      throw new Error('Task not found');
-    }
+    if (!result) throw new Error('Task not found');
     return this.parseTaskDetail(result);
   }
 
-  // Mark task as complete
   async completeTask(listId, taskId) {
     const script = `
       tell application "Reminders"
-        repeat with aList in lists
-          if id of aList is "${listId}" then
-            repeat with aReminder in reminders of aList
-              if id of aReminder is "${taskId}" then
-                set completed of aReminder to true
-                return "success"
-              end if
-            end repeat
+        set targetList to first list whose id is "${listId}"
+        repeat with aReminder in reminders of targetList
+          if id of aReminder is "${taskId}" then
+            set completed of aReminder to true
+            return "success"
           end if
         end repeat
         return "not found"
       end tell
     `;
-    
+
     const result = this.executeAppleScript(script);
-    if (result === 'not found') {
-      throw new Error('Task not found');
-    }
+    if (result === 'not found') throw new Error('Task not found');
+    // Invalidate task cache for this list
+    this._cache.forEach((_, key) => { if (key.startsWith(`tasks:${listId}:`)) this._cache.delete(key); });
     return { success: true, message: 'Task marked as complete' };
   }
 
-  // Create a new task
   async createTask(listId, taskData) {
     const name = taskData.name || taskData.title || 'Untitled Task';
     const notes = taskData.notes || taskData.description || '';
-    
+
     let script = `
       tell application "Reminders"
-        repeat with aList in lists
-          if id of aList is "${listId}" then
-            set newReminder to make new reminder at aList with properties {name:"${this.escapeString(name)}"}
+        set targetList to first list whose id is "${listId}"
+        set newReminder to make new reminder at targetList with properties {name:"${this.escapeString(name)}"}
     `;
-    
+
     if (notes) {
-      script += `\n            set body of newReminder to "${this.escapeString(notes)}"`;
+      script += `\n        set body of newReminder to "${this.escapeString(notes)}"`;
     }
-    
+
     script += `
-            return id of newReminder
-          end if
-        end repeat
+        return id of newReminder
       end tell
     `;
-    
+
     const result = this.executeAppleScript(script);
-    return { id: result, name: name };
+    // Invalidate task cache for this list
+    this._cache.forEach((_, key) => { if (key.startsWith(`tasks:${listId}:`)) this._cache.delete(key); });
+    return { id: result, name };
   }
 
-  // Helper to escape strings for AppleScript
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
   escapeString(str) {
     return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
   }
 
-  // Parse lists output
   parseListsOutput(output) {
-    if (!output || output.trim() === '') {
-      return [];
-    }
-
+    if (!output || output.trim() === '') return [];
     const lists = [];
-    const listBlocks = output.split('LIST_START');
-
-    for (const block of listBlocks) {
+    for (const block of output.split('LIST_START')) {
       if (!block.includes('LIST_END')) continue;
-
-      const lines = block.split('\n');
       const list = {};
-
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (trimmed.startsWith('ID:')) {
-          list.id = trimmed.substring(3).trim();
-        } else if (trimmed.startsWith('NAME:')) {
-          list.name = trimmed.substring(5).trim();
-        }
+      for (const line of block.split('\n')) {
+        const t = line.trim();
+        if (t.startsWith('ID:'))   list.id   = t.substring(3).trim();
+        if (t.startsWith('NAME:')) list.name = t.substring(5).trim();
       }
-
-      if (list.id && list.name) {
-        lists.push(list);
-      }
+      if (list.id && list.name) lists.push(list);
     }
-
     return lists;
   }
 
-  // Parse tasks output
   parseTasksOutput(output) {
-    if (!output || output.trim() === '') {
-      return [];
-    }
-
+    if (!output || output.trim() === '') return [];
     const tasks = [];
-    const taskBlocks = output.split('TASK_START');
-
-    for (const block of taskBlocks) {
+    for (const block of output.split('TASK_START')) {
       if (!block.includes('TASK_END')) continue;
-
-      const lines = block.split('\n');
       const task = {};
-
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (trimmed.startsWith('ID:')) {
-          task.id = trimmed.substring(3).trim();
-        } else if (trimmed.startsWith('NAME:')) {
-          task.name = trimmed.substring(5).trim();
-        } else if (trimmed.startsWith('COMPLETED:')) {
-          task.completed = trimmed.substring(10).trim() === 'true';
-        } else if (trimmed.startsWith('NOTES:')) {
-          task.notes = trimmed.substring(6).trim();
-        } else if (trimmed.startsWith('DUE:')) {
-          task.dueDate = trimmed.substring(4).trim();
-        }
+      for (const line of block.split('\n')) {
+        const t = line.trim();
+        if (t.startsWith('ID:'))        task.id        = t.substring(3).trim();
+        if (t.startsWith('NAME:'))      task.name      = t.substring(5).trim();
+        if (t.startsWith('COMPLETED:')) task.completed = t.substring(10).trim() === 'true';
+        if (t.startsWith('NOTES:'))     task.notes     = t.substring(6).trim();
+        if (t.startsWith('DUE:'))       task.dueDate   = t.substring(4).trim();
       }
-
-      if (task.id && task.name !== undefined) {
-        tasks.push(task);
-      }
+      if (task.id && task.name !== undefined) tasks.push(task);
     }
-
     return tasks;
   }
 
-  // Parse task detail output
   parseTaskDetail(output) {
-    if (!output || output.trim() === '') {
-      throw new Error('Task not found');
-    }
-
-    const lines = output.split('\n');
+    if (!output || output.trim() === '') throw new Error('Task not found');
     const task = {};
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('ID:')) {
-        task.id = trimmed.substring(3).trim();
-      } else if (trimmed.startsWith('NAME:')) {
-        task.name = trimmed.substring(5).trim();
-      } else if (trimmed.startsWith('COMPLETED:')) {
-        task.completed = trimmed.substring(10).trim() === 'true';
-      } else if (trimmed.startsWith('NOTES:')) {
-        task.notes = trimmed.substring(6).trim();
-      } else if (trimmed.startsWith('DUE:')) {
-        task.dueDate = trimmed.substring(4).trim();
-      } else if (trimmed.startsWith('CREATED:')) {
-        task.createdDate = trimmed.substring(8).trim();
-      }
+    for (const line of output.split('\n')) {
+      const t = line.trim();
+      if (t.startsWith('ID:'))          task.id          = t.substring(3).trim();
+      if (t.startsWith('NAME:'))        task.name        = t.substring(5).trim();
+      if (t.startsWith('COMPLETED:'))   task.completed   = t.substring(10).trim() === 'true';
+      if (t.startsWith('NOTES:'))       task.notes       = t.substring(6).trim();
+      if (t.startsWith('DUE:'))         task.dueDate     = t.substring(4).trim();
+      if (t.startsWith('CREATED:'))     task.createdDate = t.substring(8).trim();
     }
-
     return task;
   }
 }

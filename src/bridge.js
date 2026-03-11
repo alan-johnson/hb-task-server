@@ -42,7 +42,8 @@ function startBridge(providers) {
 
   if (!bridgeUrl || !apiKey) return;
 
-  const provider = providers['apple'];
+  const providerName = process.env.DEFAULT_PROVIDER || 'apple';
+  const provider = providers[providerName];
   let retryDelay = INITIAL_RETRY_MS;
 
   function connect() {
