@@ -5,6 +5,7 @@
  */
 
 const WebSocket = require('ws');
+const logger = require('./logger');
 
 const INITIAL_RETRY_MS = 5_000;
 const MAX_RETRY_MS = 60_000;
@@ -47,11 +48,10 @@ function startBridge(providers) {
   let retryDelay = INITIAL_RETRY_MS;
 
   function connect() {
-    console.log(`Bridge: connecting to ${bridgeUrl}...`);
+    logger.log(`Bridge: connecting to ${bridgeUrl}...`);
     const ws = new WebSocket(bridgeUrl);
 
     ws.on('open', () => {
-      retryDelay = INITIAL_RETRY_MS;
       ws.send(JSON.stringify({ type: 'auth', apiKey }));
     });
 
@@ -60,12 +60,13 @@ function startBridge(providers) {
       try { msg = JSON.parse(data); } catch { return; }
 
       if (msg.type === 'auth_ok') {
-        console.log('Bridge: connected to UpQ server');
+        retryDelay = INITIAL_RETRY_MS;
+        logger.log('Bridge: connected to UpQ server');
         return;
       }
 
       if (msg.type === 'auth_error') {
-        console.error('Bridge: authentication failed —', msg.error, '— check BRIDGE_API_KEY in .env');
+        logger.error('Bridge: authentication failed —', msg.error, '— check BRIDGE_API_KEY in .env');
         ws.close();
         return;
       }
@@ -94,13 +95,13 @@ function startBridge(providers) {
     });
 
     ws.on('close', () => {
-      console.log(`Bridge: disconnected — retrying in ${retryDelay / 1000}s`);
+      logger.log(`Bridge: disconnected — retrying in ${retryDelay / 1000}s`);
       setTimeout(connect, retryDelay);
       retryDelay = Math.min(retryDelay * 2, MAX_RETRY_MS);
     });
 
     ws.on('error', (err) => {
-      console.error('Bridge: error —', err.message);
+      logger.error('Bridge: error —', err.message);
     });
   }
 

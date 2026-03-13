@@ -12,6 +12,7 @@ const bodyParser = require('body-parser');
 const AppleRemindersProvider = require('./providers/apple/apple');
 const RemindersCliProvider = require('./providers/reminders-cli/reminders-cli');
 const { startBridge } = require('./bridge');
+const logger = require('./logger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -90,7 +91,7 @@ app.get('/api/lists/:listId/tasks', async (req, res) => {
     };
 
     const tasks = await provider.getTasks(listId, options);
-    console.log(`Fetched ${tasks.length} tasks for list ${listId} from provider ${providerName}`);
+    logger.log(`Fetched ${tasks.length} tasks for list ${listId} from provider ${providerName}`);
     res.json({
       provider: providerName,
       listId,
@@ -163,7 +164,7 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  logger.error(err.stack);
   res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
@@ -173,14 +174,14 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   startBridge(providers);
-  console.log(`Task Server running on http://localhost:${PORT}`);
-  console.log(`Default provider: ${process.env.DEFAULT_PROVIDER || 'apple'}`);
-  console.log('\nAvailable endpoints:');
-  console.log('  GET  /health');
-  console.log('  GET  /api/providers');
-  console.log('  GET  /api/lists?provider=apple|reminders-cli');
-  console.log('  GET  /api/lists/:listId/tasks');
-  console.log('  GET  /api/lists/:listId/tasks/:taskId');
-  console.log('  POST /api/lists/:listId/tasks');
-  console.log('  PATCH /api/lists/:listId/tasks/:taskId/complete');
+  logger.log(`Task Server running on http://localhost:${PORT}`);
+  logger.log(`Default provider: ${process.env.DEFAULT_PROVIDER || 'apple'}`);
+  logger.log('\nAvailable endpoints:');
+  logger.log('  GET  /health');
+  logger.log('  GET  /api/providers');
+  logger.log('  GET  /api/lists?provider=apple|reminders-cli');
+  logger.log('  GET  /api/lists/:listId/tasks');
+  logger.log('  GET  /api/lists/:listId/tasks/:taskId');
+  logger.log('  POST /api/lists/:listId/tasks');
+  logger.log('  PATCH /api/lists/:listId/tasks/:taskId/complete');
 });

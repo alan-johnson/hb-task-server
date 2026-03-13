@@ -85,14 +85,13 @@ class RemindersCliProvider {
     const cliTasks = JSON.parse(output);
 
     // Convert CLI format to API format
-    const tasks = cliTasks.map((task, index) => ({
+    const tasks = cliTasks.map((task) => ({
       id: task.externalId,
       name: task.title,
       completed: task.isCompleted,
       notes: task.notes || '',
       dueDate: task.dueDate || null,
-      priority: task.priority,
-      index: index // Store index for complete/delete operations
+      priority: task.priority
     }));
 
     // Apply limit if specified
@@ -117,65 +116,51 @@ class RemindersCliProvider {
 
   // Mark task as complete
   async completeTask(listId, taskId) {
-    // Need to get the task index for the CLI command
-    const tasks = await this.getTasks(listId, { showCompleted: false });
-    const task = tasks.find(t => t.id === taskId);
-
-    if (!task) {
-      throw new Error('Task not found');
-    }
-
     const listName = this.listIdToName[listId] || listId;
-    const taskIndex = task.index; // CLI uses 0-based indexing
-
-    this.executeCommand(`complete "${this.escapeString(listName)}" ${taskIndex}`);
-
+    this.executeCommand(`complete "${this.escapeString(listName)}" ${taskId}`);
     return { success: true, message: 'Task marked as complete' };
   }
 
   // Update a task's name and/or notes (CLI does not support changing due date)
   async updateTask(listId, taskId, taskData) {
-    const tasks = await this.getTasks(listId, { showCompleted: true });
-    const task = tasks.find(t => t.id === taskId);
-
-    if (!task) {
-      throw new Error('Task not found');
-    }
-
     const listName = this.listIdToName[listId] || listId;
-    const taskIndex = task.index;
 
-    let args = `edit "${this.escapeString(listName)}" ${taskIndex}`;
+    let args = `edit "${this.escapeString(listName)}" ${taskId}`;
 
     if (taskData.name) {
       args += ` "${this.escapeString(taskData.name)}"`;
     }
 
-    if (taskData.notes !== undefined) {
-      args += ` --notes "${this.escapeString(taskData.notes || '')}"`;
-    }
-
-    if (taskData.priority !== undefined) {
-      args += ` --priority ${taskData.priority}`;
+    if (taskData.notes) {
+      args += ` --notes "${this.escapeString(taskData.notes)}"`;
     }
 
     this.executeCommand(args);
+
+    // CLI edit doesn't support --priority; use AppleScript for that
+    if (taskData.priority !== undefined) {
+      const listName = this.listIdToName[listId] || listId;
+      const script = `
+        tell application "Reminders"
+          set targetList to first list whose name is "${listName.replace(/"/g, '\\"')}"
+          repeat with aReminder in reminders of targetList
+            if id of aReminder is "${taskId}" then
+              set priority of aReminder to ${taskData.priority}
+              exit repeat
+            end if
+          end repeat
+        end tell
+      `;
+      execSync(`osascript -e '${script.replace(/'/g, "'\\''")}'`, { encoding: 'utf-8', timeout: 30000 });
+    }
 
     return { success: true, message: 'Task updated' };
   }
 
   // Delete a task
   async deleteTask(listId, taskId) {
-    const tasks = await this.getTasks(listId, { showCompleted: true });
-    const task = tasks.find(t => t.id === taskId);
-
-    if (!task) {
-      throw new Error('Task not found');
-    }
-
     const listName = this.listIdToName[listId] || listId;
-    this.executeCommand(`delete "${this.escapeString(listName)}" ${task.index}`);
-
+    this.executeCommand(`delete "${this.escapeString(listName)}" ${taskId}`);
     return { success: true, message: 'Task deleted' };
   }
 
