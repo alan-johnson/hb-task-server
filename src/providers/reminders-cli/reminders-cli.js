@@ -137,15 +137,23 @@ class RemindersCliProvider {
 
     this.executeCommand(args);
 
-    // CLI edit doesn't support --priority; use AppleScript for that
-    if (taskData.priority !== undefined) {
-      const listName = this.listIdToName[listId] || listId;
-      const script = `
+    // CLI edit doesn't support priority or due date — use AppleScript for those
+    const needsAppleScript = taskData.priority !== undefined || taskData.dueDate;
+    if (needsAppleScript) {
+      let script = `
         tell application "Reminders"
           set targetList to first list whose name is "${listName.replace(/"/g, '\\"')}"
           repeat with aReminder in reminders of targetList
-            if id of aReminder is "${taskId}" then
-              set priority of aReminder to ${taskData.priority}
+            if id of aReminder is "x-apple-reminder://${taskId}" then
+      `;
+      if (taskData.priority !== undefined) {
+        script += `\n              set priority of aReminder to ${this._priorityToInt(taskData.priority)}`;
+      }
+      if (taskData.dueDate) {
+        const [y, m, d] = taskData.dueDate.split('-');
+        script += `\n              set due date of aReminder to date "${Number(m)}/${Number(d)}/${y}"`;
+      }
+      script += `
               exit repeat
             end if
           end repeat
@@ -193,6 +201,10 @@ class RemindersCliProvider {
       id: 'pending', // CLI doesn't return ID immediately
       name: title
     };
+  }
+
+  _priorityToInt(priority) {
+    return { none: 0, high: 1, medium: 5, low: 9 }[priority] ?? 0;
   }
 
   // Helper to escape strings for shell commands
