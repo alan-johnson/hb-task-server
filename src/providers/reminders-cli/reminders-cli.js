@@ -91,7 +91,7 @@ class RemindersCliProvider {
       completed: task.isCompleted,
       notes: task.notes || '',
       dueDate: task.dueDate || null,
-      priority: task.priority
+      priority: this._intToPriority(task.priority)
     }));
 
     // Apply limit if specified
@@ -204,7 +204,14 @@ class RemindersCliProvider {
   }
 
   _priorityToInt(priority) {
-    return { none: 0, high: 1, medium: 5, low: 9 }[priority] ?? 0;
+    return { none: 0, high: 1, medium: 5, normal: 5, low: 9 }[priority] ?? 0;
+  }
+
+  _intToPriority(n) {
+    if (n === 1) return 'high';
+    if (n === 5) return 'normal';
+    if (n === 9) return 'low';
+    return 'low';
   }
 
   // Helper to escape strings for shell commands
