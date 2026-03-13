@@ -194,6 +194,9 @@ class AppleRemindersProvider {
       const [y, m, d] = taskData.dueDate.split('-');
       script += `\n            set due date of aReminder to date "${Number(m)}/${Number(d)}/${y}"`;
     }
+    if (taskData.priority !== undefined) {
+      script += `\n            set priority of aReminder to ${taskData.priority}`;
+    }
 
     script += `
             return "success"

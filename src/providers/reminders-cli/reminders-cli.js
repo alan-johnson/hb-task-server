@@ -155,6 +155,10 @@ class RemindersCliProvider {
       args += ` --notes "${this.escapeString(taskData.notes || '')}"`;
     }
 
+    if (taskData.priority !== undefined) {
+      args += ` --priority ${taskData.priority}`;
+    }
+
     this.executeCommand(args);
 
     return { success: true, message: 'Task updated' };
