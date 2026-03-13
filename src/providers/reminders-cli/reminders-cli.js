@@ -133,6 +133,48 @@ class RemindersCliProvider {
     return { success: true, message: 'Task marked as complete' };
   }
 
+  // Update a task's name and/or notes (CLI does not support changing due date)
+  async updateTask(listId, taskId, taskData) {
+    const tasks = await this.getTasks(listId, { showCompleted: true });
+    const task = tasks.find(t => t.id === taskId);
+
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    const listName = this.listIdToName[listId] || listId;
+    const taskIndex = task.index;
+
+    let args = `edit "${this.escapeString(listName)}" ${taskIndex}`;
+
+    if (taskData.name) {
+      args += ` "${this.escapeString(taskData.name)}"`;
+    }
+
+    if (taskData.notes !== undefined) {
+      args += ` --notes "${this.escapeString(taskData.notes || '')}"`;
+    }
+
+    this.executeCommand(args);
+
+    return { success: true, message: 'Task updated' };
+  }
+
+  // Delete a task
+  async deleteTask(listId, taskId) {
+    const tasks = await this.getTasks(listId, { showCompleted: true });
+    const task = tasks.find(t => t.id === taskId);
+
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    const listName = this.listIdToName[listId] || listId;
+    this.executeCommand(`delete "${this.escapeString(listName)}" ${task.index}`);
+
+    return { success: true, message: 'Task deleted' };
+  }
+
   // Create a new task
   async createTask(listId, taskData) {
     const listName = this.listIdToName[listId] || listId;

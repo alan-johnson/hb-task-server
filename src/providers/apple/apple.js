@@ -176,6 +176,59 @@ class AppleRemindersProvider {
     return { success: true, message: 'Task marked as complete' };
   }
 
+  async updateTask(listId, taskId, taskData) {
+    let script = `
+      tell application "Reminders"
+        set targetList to first list whose id is "${listId}"
+        repeat with aReminder in reminders of targetList
+          if id of aReminder is "${taskId}" then
+    `;
+
+    if (taskData.name) {
+      script += `\n            set name of aReminder to "${this.escapeString(taskData.name)}"`;
+    }
+    if (taskData.notes !== undefined) {
+      script += `\n            set body of aReminder to "${this.escapeString(taskData.notes || '')}"`;
+    }
+    if (taskData.dueDate) {
+      const [y, m, d] = taskData.dueDate.split('-');
+      script += `\n            set due date of aReminder to date "${Number(m)}/${Number(d)}/${y}"`;
+    }
+
+    script += `
+            return "success"
+          end if
+        end repeat
+        return "not found"
+      end tell
+    `;
+
+    const result = this.executeAppleScript(script);
+    if (result === 'not found') throw new Error('Task not found');
+    this._cache.forEach((_, key) => { if (key.startsWith(`tasks:${listId}:`)) this._cache.delete(key); });
+    return { success: true, message: 'Task updated' };
+  }
+
+  async deleteTask(listId, taskId) {
+    const script = `
+      tell application "Reminders"
+        set targetList to first list whose id is "${listId}"
+        repeat with aReminder in reminders of targetList
+          if id of aReminder is "${taskId}" then
+            delete aReminder
+            return "success"
+          end if
+        end repeat
+        return "not found"
+      end tell
+    `;
+
+    const result = this.executeAppleScript(script);
+    if (result === 'not found') throw new Error('Task not found');
+    this._cache.forEach((_, key) => { if (key.startsWith(`tasks:${listId}:`)) this._cache.delete(key); });
+    return { success: true, message: 'Task deleted' };
+  }
+
   async createTask(listId, taskData) {
     const name = taskData.name || taskData.title || 'Untitled Task';
     const notes = taskData.notes || taskData.description || '';
