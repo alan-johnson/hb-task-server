@@ -53,6 +53,7 @@ function startBridge(providers) {
     const ws = new WebSocket(bridgeUrl);
 
     let heartbeat = null;
+    let suppressDisconnect = false;
 
     ws.on('open', () => {
       ws.send(JSON.stringify({ type: 'auth', apiKey }));
@@ -100,13 +101,16 @@ function startBridge(providers) {
 
     ws.on('close', () => {
       clearInterval(heartbeat);
-      logger.log(`Bridge: disconnected — retrying in ${retryDelay / 1000}s`);
+      if (!suppressDisconnect) {
+        logger.log(`Bridge: disconnected — retrying in ${retryDelay / 1000}s`);
+      }
       setTimeout(connect, retryDelay);
       retryDelay = Math.min(retryDelay * 2, MAX_RETRY_MS);
     });
 
     ws.on('error', (err) => {
       if (err.message.includes('400')) {
+        suppressDisconnect = true;
         logger.warn(`Bridge: server not ready — retrying in ${retryDelay / 1000}s`);
       } else {
         logger.error('Bridge: error —', err.message);
