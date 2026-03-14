@@ -9,6 +9,7 @@ const logger = require('./logger');
 
 const INITIAL_RETRY_MS = 5_000;
 const MAX_RETRY_MS = 60_000;
+const HEARTBEAT_MS = 30_000;
 
 // Method dispatch table: maps bridge method names to provider calls
 const METHODS = {
@@ -51,6 +52,8 @@ function startBridge(providers) {
     logger.log(`Bridge: connecting to ${bridgeUrl}...`);
     const ws = new WebSocket(bridgeUrl);
 
+    let heartbeat = null;
+
     ws.on('open', () => {
       ws.send(JSON.stringify({ type: 'auth', apiKey }));
     });
@@ -62,6 +65,7 @@ function startBridge(providers) {
       if (msg.type === 'auth_ok') {
         retryDelay = INITIAL_RETRY_MS;
         logger.log('Bridge: connected to UpQ server');
+        heartbeat = setInterval(() => ws.ping(), HEARTBEAT_MS);
         return;
       }
 
@@ -95,13 +99,18 @@ function startBridge(providers) {
     });
 
     ws.on('close', () => {
+      clearInterval(heartbeat);
       logger.log(`Bridge: disconnected — retrying in ${retryDelay / 1000}s`);
       setTimeout(connect, retryDelay);
       retryDelay = Math.min(retryDelay * 2, MAX_RETRY_MS);
     });
 
     ws.on('error', (err) => {
-      logger.error('Bridge: error —', err.message);
+      if (err.message.includes('400')) {
+        logger.warn(`Bridge: server not ready — retrying in ${retryDelay / 1000}s`);
+      } else {
+        logger.error('Bridge: error —', err.message);
+      }
     });
   }
 
