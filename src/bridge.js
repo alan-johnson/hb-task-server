@@ -53,7 +53,7 @@ function startBridge(providers) {
     const ws = new WebSocket(bridgeUrl);
 
     let heartbeat = null;
-    let suppressDisconnect = false;
+    let authenticated = false;
 
     ws.on('open', () => {
       ws.send(JSON.stringify({ type: 'auth', apiKey }));
@@ -64,6 +64,7 @@ function startBridge(providers) {
       try { msg = JSON.parse(data); } catch { return; }
 
       if (msg.type === 'auth_ok') {
+        authenticated = true;
         retryDelay = INITIAL_RETRY_MS;
         logger.log('Bridge: connected to UpQ server');
         heartbeat = setInterval(() => ws.ping(), HEARTBEAT_MS);
@@ -101,7 +102,7 @@ function startBridge(providers) {
 
     ws.on('close', () => {
       clearInterval(heartbeat);
-      if (!suppressDisconnect) {
+      if (authenticated) {
         logger.log(`Bridge: disconnected — retrying in ${retryDelay / 1000}s`);
       }
       setTimeout(connect, retryDelay);
