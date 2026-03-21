@@ -132,6 +132,9 @@ build_binary() {
   mkdir -p "$zip_staging"
   cp "$out" "$zip_staging/"
   cp "$BUILD_DIR/.env.example" "$zip_staging/.env.example"
+  cp QUICKSTART.md "$zip_staging/README.txt"
+  cp LICENSE.txt "$zip_staging/LICENSE.txt"
+  cp com.handsbreadth.hb-task-server.plist "$zip_staging/"
   [[ -d "$BUILD_DIR/providers" ]] && cp -r "$BUILD_DIR/providers" "$zip_staging/providers"
   (cd "$zip_staging" && zip -r "../$(basename "$out").zip" .)
   rm -rf "$zip_staging"

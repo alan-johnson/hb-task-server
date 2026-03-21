@@ -24,10 +24,11 @@
 
 ## Running the Server
 
-Double-click the **hb-task-server** application:
+Open **Terminal**, navigate to the folder where you unzipped the server, then run:
 
-- `hb-task-server-arm64` — Apple Silicon Macs (M1/M2/M3)
-- `hb-task-server-x64` — Intel Macs
+```bash
+./hb-task-server-arm64
+```
 
 The server starts at `http://localhost:3000` (or the port set in `.env`).
 
@@ -113,6 +114,7 @@ See [README.md](README.md) for full details.
 | Problem | Solution |
 |---|---|
 | "AppleScript error: Not authorized" | System Settings → Privacy & Security → Automation → enable Terminal |
+| "macOS cannot verify..." on hb-task-server-arm64 | Run `xattr -d com.apple.quarantine hb-task-server-arm64` |
 | "macOS cannot verify that this app is free from malware" | Run `xattr -d com.apple.quarantine providers/reminders-cli/reminders` |
 | "Permission denied" on reminders binary | Run `chmod +x providers/reminders-cli/reminders` |
 | Port already in use | Change `PORT` in `.env` and restart the server |
