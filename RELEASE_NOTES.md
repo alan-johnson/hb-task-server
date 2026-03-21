@@ -1,6 +1,6 @@
 ## Handsbreadth Task Server
 
-A local REST API for macOS that bridges Apple Reminders to your Pebble watch via the **Handsbreadth Pebble app** _(coming soon)_.
+A local macOS REST API server for Pebble watches. Together, with the **hb-reminders** Pebble watch app, displays Apple Reminders on your Pebble watch enabling you to view and manage your Reminders tasks on your Pebble watch.
 
 > **Requirements:** macOS on Apple Silicon (M1 / M2 / M3 / M4). Intel Mac support is planned for a future release.
 
@@ -12,12 +12,18 @@ A local REST API for macOS that bridges Apple Reminders to your Pebble watch via
 
 2. **Unzip** it into a permanent folder, for example `~/hb-task-server/`.
 
-3. **Remove the quarantine attribute** so macOS will allow the binary to run:
+3. **Remove the quarantine attribute** so macOS will allow the binary to run. Start **Terminal** then type the following:
+   Change to the name of the hb-task-server folder from step 2 then press the ENTER key, for example:
+   ```
+   cd ~/hb-task-server/ 
+   <press ENTER key>
+   ``` 
    ```
    xattr -d com.apple.quarantine hb-task-server-arm64
+   <press the ENTER key>
    ```
 
-4. **Configure** your settings — copy the template and open it:
+4. **Configure** your settings — copy the template and open it. In Terminal, type:
    ```
    cp .env.example .env
    open .env
@@ -45,6 +51,7 @@ A `com.handsbreadth.hb-task-server.plist` file is included in the zip.
    ```
    cp com.handsbreadth.hb-task-server.plist ~/Library/LaunchAgents/
    launchctl load ~/Library/LaunchAgents/com.handsbreadth.hb-task-server.plist
+   <press the ENTER key>
    ```
 
 3. The server will now start automatically every time you log in.
@@ -52,26 +59,30 @@ A `com.handsbreadth.hb-task-server.plist` file is included in the zip.
 To stop and disable auto-start:
 ```
 launchctl unload ~/Library/LaunchAgents/com.handsbreadth.hb-task-server.plist
+<press the ENTER key>
 ```
 
 ---
 
 ## UpQ Bridge (optional)
 
-If you subscribe to [UpQ](https://upq.io), you can connect this server to the UpQ cloud so your Pebble watch can reach Apple Reminders from anywhere.
+If you subscribe to [UpQ](https://tasks.handsbreadth.com), you can connect this server to the UpQ cloud so your Pebble watch can reach Apple Reminders from anywhere. The UpQ server also pulls your Apple Reminders, Microsoft Tasks and Google Tasks together into one easily managed list. Also, UpQ automatically prioritizes your tasks into what needs your attention now versus what can wait until later.
 
-1. Log in to UpQ and generate a bridge API key:
+1. Go to https://tasks.handsbreadth.com then register to create an account. A free trial is available!
+
+2. Log in to UpQ.  
+
+3. Click the Settings button, if you are not already there.
+
+4. In the Apple Reminders section, click the **Generate Key** button to generate a bridge API key.
+
+5. Copy the generated key then edit the `.env` file:
    ```
-   POST /auth/bridge/key
+   BRIDGE_URL=ws://tasks.handsbreadth.com/bridge
+   BRIDGE_API_KEY=<key from step 4>
    ```
 
-2. Add the key and your UpQ server address to `.env`:
-   ```
-   BRIDGE_URL=wss://your-upq-domain.com/bridge
-   BRIDGE_API_KEY=<key from step 1>
-   ```
-
-3. Restart the server. You will see `Bridge: connected to UpQ server` in the output.
+6. Restart the local **hb-task-server** server. You will see `Bridge: connected to UpQ server` in the output.
 
 ---
 
@@ -99,4 +110,4 @@ providers/
 | "AppleScript error: Not authorized" | System Settings → Privacy & Security → Automation → enable Terminal |
 | "macOS cannot verify..." on reminders binary | `xattr -d com.apple.quarantine providers/reminders-cli/reminders` |
 | "Permission denied" on reminders binary | `chmod +x providers/reminders-cli/reminders` |
-| Port already in use | Change `PORT` in `.env` and restart |
+| Port already in use | Change the `PORT` value in `.env` and restart |
