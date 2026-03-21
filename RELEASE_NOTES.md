@@ -74,9 +74,9 @@ If you subscribe to [UpQ](https://tasks.handsbreadth.com), you can connect this 
 
 3. Click the Settings button, if you are not already there.
 
-4. In the Apple Reminders section, click the **Generate Key** button to generate a bridge API key.
+4. In the Apple Reminders section, click the **Generate Key** button. The key will be displayed on screen.
 
-5. Copy the generated key then edit the `.env` file:
+5. Copy the displayed key then edit the `.env` file:
    ```
    BRIDGE_URL=ws://tasks.handsbreadth.com/bridge
    BRIDGE_API_KEY=<key from step 4>
