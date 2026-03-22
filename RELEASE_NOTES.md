@@ -12,16 +12,12 @@ A local macOS REST API server for Pebble watches. Together, with the **hb-remind
 
 2. **Unzip** it into a permanent folder, for example `~/hb-task-server/`.
 
-3. **Remove the quarantine attribute** so macOS will allow the binary to run. Start **Terminal** then type the following:
-   Change to the name of the hb-task-server folder from step 2 then press the ENTER key, for example:
+3. **Remove the quarantine attribute** so macOS will allow the binary to run. Start **Terminal**, change to the folder from step 2, then run:
    ```
-   cd ~/hb-task-server/ 
-   <press ENTER key>
-   ``` 
+   cd ~/hb-task-server/
+   xattr -r -d com.apple.quarantine .
    ```
-   xattr -d com.apple.quarantine hb-task-server-arm64
-   <press the ENTER key>
-   ```
+   If you see `No such xattr`, the file is already clear — continue to step 4.
 
 4. **Configure** your settings — copy the template and open it. In Terminal, type:
    ```

@@ -27,6 +27,10 @@ coverage/
 dist/
 build/
 
+# Documentation (keep only RELEASE_NOTES.md for GitHub releases)
+*.md
+!RELEASE_NOTES.md
+
 # Enterprise version: macOS-only providers (require AppleScript / local macOS binary)
 src/providers/apple/
 src/providers/reminders-cli/
