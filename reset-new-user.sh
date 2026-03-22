@@ -16,6 +16,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REMINDERS_BIN="$SCRIPT_DIR/src/providers/reminders-cli/reminders"
 ENV_FILE="$SCRIPT_DIR/.env"
+ENV_FILE_BACKUP="$SCRIPT_DIR/.env.backup"
 ENV_EXAMPLE="$SCRIPT_DIR/.env.example"
 
 echo "hb-task-server: resetting to new user state"
@@ -46,6 +47,8 @@ fi
 
 # 4. Reset .env from .env.example
 if [ -f "$ENV_EXAMPLE" ]; then
+  echo "→ Backing up .env file to .env.backup..."
+  cp "$ENV_FILE" "$ENV_FILE_BACKUP"
   echo "→ Resetting .env from .env.example..."
   cp "$ENV_EXAMPLE" "$ENV_FILE"
   echo "  Done."
