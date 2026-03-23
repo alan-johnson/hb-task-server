@@ -62,13 +62,13 @@ ok "build/ ready"
 # ── Copy providers ────────────────────────────────────────────────────────────
 
 step "Copying providers"
-if [[ -d "dist/providers" ]]; then
-  cp -r dist/providers "$BUILD_DIR/providers"
-  # Remove .DS_Store files from the copied providers
-  find "$BUILD_DIR/providers" -name ".DS_Store" -delete
-  ok "Providers copied to $BUILD_DIR/providers/"
+REMINDERS_BIN="dist/providers/reminders-cli/reminders"
+if [[ -f "$REMINDERS_BIN" ]]; then
+  mkdir -p "$BUILD_DIR/providers/reminders-cli"
+  cp "$REMINDERS_BIN" "$BUILD_DIR/providers/reminders-cli/reminders"
+  ok "reminders binary copied to $BUILD_DIR/providers/reminders-cli/"
 else
-  log "Warning: dist/providers not found — skipping."
+  log "Warning: $REMINDERS_BIN not found — skipping."
 fi
 
 # Copy .env.example for reference
