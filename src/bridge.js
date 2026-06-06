@@ -54,10 +54,13 @@ function startBridge(providers) {
 
     let heartbeat = null;
     let authenticated = false;
+    let pongReceived = true;
 
     ws.on('open', () => {
       ws.send(JSON.stringify({ type: 'auth', apiKey }));
     });
+
+    ws.on('pong', () => { pongReceived = true; });
 
     ws.on('message', async (data) => {
       let msg;
@@ -67,7 +70,11 @@ function startBridge(providers) {
         authenticated = true;
         retryDelay = INITIAL_RETRY_MS;
         logger.log('Bridge: connected to UpQ server');
-        heartbeat = setInterval(() => ws.ping(), HEARTBEAT_MS);
+        heartbeat = setInterval(() => {
+          if (!pongReceived) { ws.terminate(); return; }
+          pongReceived = false;
+          ws.ping();
+        }, HEARTBEAT_MS);
         return;
       }
 
@@ -102,20 +109,13 @@ function startBridge(providers) {
 
     ws.on('close', () => {
       clearInterval(heartbeat);
-      if (authenticated) {
-        logger.log(`Bridge: disconnected — retrying in ${retryDelay / 1000}s`);
-      }
+      logger.log(`Bridge: ${authenticated ? 'disconnected' : 'connection failed'} — retrying in ${retryDelay / 1000}s`);
       setTimeout(connect, retryDelay);
       retryDelay = Math.min(retryDelay * 2, MAX_RETRY_MS);
     });
 
     ws.on('error', (err) => {
-      if (err.message.includes('400')) {
-        suppressDisconnect = true;
-        logger.warn(`Bridge: server not ready — retrying in ${retryDelay / 1000}s`);
-      } else {
-        logger.error('Bridge: error —', err.message);
-      }
+      logger.error('Bridge: error —', err.message);
     });
   }
 
