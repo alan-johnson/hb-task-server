@@ -4,6 +4,8 @@
  * All rights reserved.
  */
 
+const http = require('http');
+const https = require('https');
 const WebSocket = require('ws');
 const logger = require('./logger');
 
@@ -48,6 +50,19 @@ function startBridge(providers) {
   const provider = providers[providerName];
   let retryDelay = INITIAL_RETRY_MS;
 
+  // Fire-and-forget HTTP ping to wake a sleeping server (e.g. Passenger on shared hosting).
+  // WebSocket upgrades don't trigger a wake-up on Passenger; a regular HTTP request does.
+  function wakeServer() {
+    try {
+      const url = new URL(bridgeUrl.replace(/^ws/, 'http'));
+      url.pathname = '/health';
+      const client = url.protocol === 'https:' ? https : http;
+      const req = client.get(url.toString(), (res) => res.resume());
+      req.on('error', () => {});
+      req.setTimeout(10_000, () => req.destroy());
+    } catch { /* ignore */ }
+  }
+
   function connect() {
     logger.log(`Bridge: connecting to ${bridgeUrl}...`);
     const ws = new WebSocket(bridgeUrl);
@@ -55,6 +70,7 @@ function startBridge(providers) {
     let heartbeat = null;
     let authenticated = false;
     let pongReceived = true;
+    let got400 = false;
 
     ws.on('open', () => {
       ws.send(JSON.stringify({ type: 'auth', apiKey }));
@@ -110,12 +126,14 @@ function startBridge(providers) {
     ws.on('close', () => {
       clearInterval(heartbeat);
       logger.log(`Bridge: ${authenticated ? 'disconnected' : 'connection failed'} — retrying in ${retryDelay / 1000}s`);
+      if (got400) wakeServer();
       setTimeout(connect, retryDelay);
       retryDelay = Math.min(retryDelay * 2, MAX_RETRY_MS);
     });
 
     ws.on('error', (err) => {
       logger.error('Bridge: error —', err.message);
+      if (err.message.includes('400')) got400 = true;
     });
   }
 
