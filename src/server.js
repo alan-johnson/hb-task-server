@@ -172,9 +172,11 @@ app.use((err, req, res, next) => {
 // Start server
 // ============================================
 
+const { version } = require('../package.json');
+
 app.listen(PORT, () => {
   startBridge(providers);
-  logger.log(`Task Server running on http://localhost:${PORT}`);
+  logger.log(`Task Server v${version} running on http://localhost:${PORT}`);
   logger.log(`Default provider: ${process.env.DEFAULT_PROVIDER || 'apple'}`);
   logger.log('\nAvailable endpoints:');
   logger.log('  GET  /health');
