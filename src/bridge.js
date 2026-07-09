@@ -13,6 +13,17 @@ const INITIAL_RETRY_MS = 5_000;
 const MAX_RETRY_MS = 60_000;
 const HEARTBEAT_MS = 30_000;
 
+// Connections that lasted at least this long before closing are treated as a routine
+// server-side cycle (hosting/CDN recycling the socket) rather than a real problem —
+// our own heartbeat would have caught a truly dead connection well before this.
+const ROUTINE_CONNECTION_MS = 2 * 60_000;
+
+function formatDuration(ms) {
+  const totalSeconds = Math.round(ms / 1000);
+  if (totalSeconds < 60) return `${totalSeconds}s`;
+  return `${Math.round(totalSeconds / 60)}m`;
+}
+
 // Method dispatch table: maps bridge method names to provider calls
 const METHODS = {
   getLists:     (p, _)      => p.getLists(),
@@ -71,6 +82,7 @@ function startBridge(providers) {
     let authenticated = false;
     let pongReceived = true;
     let got400 = false;
+    let connectedAt = null;
 
     ws.on('open', () => {
       ws.send(JSON.stringify({ type: 'auth', apiKey }));
@@ -85,6 +97,7 @@ function startBridge(providers) {
       if (msg.type === 'auth_ok') {
         authenticated = true;
         retryDelay = INITIAL_RETRY_MS;
+        connectedAt = Date.now();
         logger.log('Bridge: connected to UpQ server');
         heartbeat = setInterval(() => {
           if (!pongReceived) { ws.terminate(); return; }
@@ -123,9 +136,22 @@ function startBridge(providers) {
       }
     });
 
-    ws.on('close', () => {
+    ws.on('close', (code, reason) => {
       clearInterval(heartbeat);
-      logger.log(`Bridge: ${authenticated ? 'disconnected' : 'connection failed'} — retrying in ${retryDelay / 1000}s`);
+      const reasonText = reason && reason.length ? reason.toString() : '(no reason given)';
+      const uptimeMs = connectedAt ? Date.now() - connectedAt : 0;
+
+      if (authenticated && uptimeMs >= ROUTINE_CONNECTION_MS) {
+        // Connection was healthy and our heartbeat was answering right up until this
+        // close — most likely the hosting/CDN layer cycling the socket on its own
+        // schedule, not a local network issue. Log plainly so it doesn't read as an error.
+        logger.log(`Bridge: server closed the connection after ${formatDuration(uptimeMs)} (code=${code} reason=${reasonText}) — reconnecting in ${retryDelay / 1000}s`);
+      } else if (authenticated) {
+        logger.warn(`Bridge: disconnected after only ${formatDuration(uptimeMs)} — code=${code} reason=${reasonText} — retrying in ${retryDelay / 1000}s (if this keeps happening quickly, there may be a real connectivity issue)`);
+      } else {
+        logger.warn(`Bridge: connection failed — code=${code} reason=${reasonText} — retrying in ${retryDelay / 1000}s`);
+      }
+
       if (got400) wakeServer();
       setTimeout(connect, retryDelay);
       retryDelay = Math.min(retryDelay * 2, MAX_RETRY_MS);

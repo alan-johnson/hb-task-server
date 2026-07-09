@@ -1,6 +1,6 @@
 {
   "name": "hb-task-server",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Local REST server for Apple Reminders on macOS",
   "main": "src/server.js",
   "scripts": {
