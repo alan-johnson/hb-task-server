@@ -60,6 +60,9 @@ function startBridge(providers) {
   const providerName = process.env.DEFAULT_PROVIDER || 'apple';
   const provider = providers[providerName];
   let retryDelay = INITIAL_RETRY_MS;
+  // Only the first connection of the process is console-worthy; reconnect cycling
+  // afterward (routine or not) is recorded to the log file but kept off the console.
+  let hasConnectedBefore = false;
 
   // Fire-and-forget HTTP ping to wake a sleeping server (e.g. Passenger on shared hosting).
   // WebSocket upgrades don't trigger a wake-up on Passenger; a regular HTTP request does.
@@ -75,7 +78,7 @@ function startBridge(providers) {
   }
 
   function connect() {
-    logger.log(`Bridge: connecting to ${bridgeUrl}...`);
+    (hasConnectedBefore ? logger.log : logger.status)(`Bridge: connecting to ${bridgeUrl}...`);
     const ws = new WebSocket(bridgeUrl);
 
     let heartbeat = null;
@@ -98,7 +101,8 @@ function startBridge(providers) {
         authenticated = true;
         retryDelay = INITIAL_RETRY_MS;
         connectedAt = Date.now();
-        logger.log('Bridge: connected to UpQ server');
+        (hasConnectedBefore ? logger.log : logger.status)('Bridge: connected to UpQ server');
+        hasConnectedBefore = true;
         heartbeat = setInterval(() => {
           if (!pongReceived) { ws.terminate(); return; }
           pongReceived = false;

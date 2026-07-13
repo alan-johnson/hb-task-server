@@ -176,14 +176,14 @@ const { version } = require('../package.json');
 
 app.listen(PORT, () => {
   startBridge(providers);
-  logger.log(`Task Server v${version} running on http://localhost:${PORT}`);
-  logger.log(`Default provider: ${process.env.DEFAULT_PROVIDER || 'apple'}`);
-  logger.log('\nAvailable endpoints:');
-  logger.log('  GET  /health');
-  logger.log('  GET  /api/providers');
-  logger.log('  GET  /api/lists?provider=apple|reminders-cli');
-  logger.log('  GET  /api/lists/:listId/tasks');
-  logger.log('  GET  /api/lists/:listId/tasks/:taskId');
-  logger.log('  POST /api/lists/:listId/tasks');
-  logger.log('  PATCH /api/lists/:listId/tasks/:taskId/complete');
+  logger.status(`Task Server v${version} running on http://localhost:${PORT}`);
+  logger.status(`Default provider: ${process.env.DEFAULT_PROVIDER || 'apple'}`);
+  logger.status('\nAvailable endpoints:');
+  logger.status('  GET  /health');
+  logger.status('  GET  /api/providers');
+  logger.status('  GET  /api/lists?provider=apple|reminders-cli');
+  logger.status('  GET  /api/lists/:listId/tasks');
+  logger.status('  GET  /api/lists/:listId/tasks/:taskId');
+  logger.status('  POST /api/lists/:listId/tasks');
+  logger.status('  PATCH /api/lists/:listId/tasks/:taskId/complete');
 });
