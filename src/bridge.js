@@ -6,6 +6,7 @@
 
 const http = require('http');
 const https = require('https');
+const { spawn } = require('child_process');
 const WebSocket = require('ws');
 const logger = require('./logger');
 
@@ -63,6 +64,17 @@ function startBridge(providers) {
   // Only the first connection of the process is console-worthy; reconnect cycling
   // afterward (routine or not) is recorded to the log file but kept off the console.
   let hasConnectedBefore = false;
+
+  // macOS puts an idle Mac into periodic "Maintenance Sleep" (Power Nap), waking only
+  // for ~45-90s every ~15-17min. This process's event loop is frozen for the rest of
+  // that cycle, so a WS drop that lands mid-sleep can't be noticed or retried until the
+  // next wake — turning a normal few-second Cloudflare-forced reconnect into a 15+min
+  // gap. `caffeinate -i` blocks idle sleep for as long as this process is alive;
+  // `-w <pid>` ties its lifetime to ours so it exits on its own if we crash.
+  const caffeinate = spawn('caffeinate', ['-i', '-w', String(process.pid)], { stdio: 'ignore' });
+  caffeinate.on('error', (err) => {
+    logger.warn('Bridge: could not start caffeinate — Mac may sleep and delay bridge reconnects:', err.message);
+  });
 
   // Fire-and-forget HTTP ping to wake a sleeping server (e.g. Passenger on shared hosting).
   // WebSocket upgrades don't trigger a wake-up on Passenger; a regular HTTP request does.

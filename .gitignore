@@ -26,9 +26,13 @@ coverage/
 dist/
 build/
 
-# Documentation (keep only RELEASE_NOTES.md for GitHub releases)
+# Documentation (public docs only — internal notes/logs stay untracked)
 *.md
 !RELEASE_NOTES.md
+!README.md
+!QUICKSTART.md
+!BUILD.md
+!AUTOSTART.md
 
 # Enterprise version: macOS-only providers (require AppleScript / local macOS binary)
 src/providers/apple/

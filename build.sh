@@ -135,6 +135,9 @@ build_binary() {
   cp QUICKSTART.md "$zip_staging/README.txt"
   cp LICENSE.txt "$zip_staging/LICENSE.txt"
   cp com.handsbreadth.hb-task-server.plist "$zip_staging/"
+  cp install-launch-agent.sh "$zip_staging/"
+  chmod +x "$zip_staging/install-launch-agent.sh"
+  cp AUTOSTART.md "$zip_staging/"
   [[ -d "$BUILD_DIR/providers" ]] && cp -r "$BUILD_DIR/providers" "$zip_staging/providers"
   (cd "$zip_staging" && zip -r "../$(basename "$out").zip" .)
   rm -rf "$zip_staging"

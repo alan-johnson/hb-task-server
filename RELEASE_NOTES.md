@@ -38,24 +38,17 @@ A `README.txt` with full instructions is included in the zip.
 
 ## Auto-start on Login (optional)
 
-A `com.handsbreadth.hb-task-server.plist` file is included in the zip.
+To have the server start automatically at login — and restart itself if it ever crashes — run the installer included in the zip:
 
-1. Open it in a text editor and replace every instance of `YOUR_USERNAME` with your Mac username.
-   _(Not sure of your username? Run `whoami` in Terminal.)_
+```
+./install-launch-agent.sh
+```
 
-2. Copy it to LaunchAgents and load it:
-   ```
-   cp com.handsbreadth.hb-task-server.plist ~/Library/LaunchAgents/
-   launchctl load ~/Library/LaunchAgents/com.handsbreadth.hb-task-server.plist
-   <press the ENTER key>
-   ```
-
-3. The server will now start automatically every time you log in.
+This registers a standard macOS LaunchAgent for you; no manual editing required. See `AUTOSTART.md` (also included in the zip) for exactly what it does.
 
 To stop and disable auto-start:
 ```
-launchctl unload ~/Library/LaunchAgents/com.handsbreadth.hb-task-server.plist
-<press the ENTER key>
+./install-launch-agent.sh --uninstall
 ```
 
 ---
@@ -89,9 +82,10 @@ hb-task-server-arm64                        ← server binary (no Node.js requir
 .env.example                                ← configuration template
 README.txt                                  ← installation guide (this document)
 LICENSE.txt
-com.handsbreadth.hb-task-server.plist       ← launchd auto-start (optional)
+com.handsbreadth.hb-task-server.plist       ← launchd auto-start template (used by install-launch-agent.sh)
+install-launch-agent.sh                     ← optional auto-start installer
+AUTOSTART.md                                ← what install-launch-agent.sh does
 providers/
-  apple/                                    ← AppleScript provider (default)
   reminders-cli/
     reminders                               ← alternative CLI provider binary
 ```
