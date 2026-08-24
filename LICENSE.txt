@@ -1,79 +1,429 @@
-PROPRIETARY SOFTWARE LICENSE AGREEMENT
+SOURCE-AVAILABLE SOFTWARE LICENSE AGREEMENT
 HANDSBREADTH LLC
-Copyright © 2026 HANDSBREADTH LLC. All Rights Reserved.
+Copyright (c) 2026 HANDSBREADTH LLC. All Rights Reserved.
 
-PLEASE READ THIS PROPRIETARY SOFTWARE LICENSE AGREEMENT (“AGREEMENT”) CAREFULLY BEFORE USING, COPYING, OR ACCESSING THE SOFTWARE. BY INSTALLING, COPYING, OR OTHERWISE USING THE SOFTWARE, YOU AGREE TO BE BOUND BY THE TERMS OF THIS AGREEMENT. IF YOU DO NOT AGREE TO THESE TERMS, DO NOT INSTALL OR USE THE SOFTWARE.
+NOTICE: THIS IS NOT AN OPEN SOURCE LICENSE. The source code of the Software is
+made publicly viewable, but the Software is proprietary. All patent rights are
+expressly reserved by HANDSBREADTH LLC and NO PATENT LICENSE OF ANY KIND IS
+GRANTED. See Section 4.
+
+PLEASE READ THIS SOURCE-AVAILABLE SOFTWARE LICENSE AGREEMENT ("AGREEMENT")
+CAREFULLY BEFORE ACCESSING, COPYING, CLONING, INSTALLING, OR USING THE SOFTWARE.
+BY ACCESSING, CLONING, COPYING, INSTALLING, OR OTHERWISE USING THE SOFTWARE, OR
+BY SUBMITTING A CONTRIBUTION, YOU AGREE TO BE BOUND BY THE TERMS OF THIS
+AGREEMENT. IF YOU DO NOT AGREE TO THESE TERMS, DO NOT ACCESS, CLONE, INSTALL, OR
+USE THE SOFTWARE.
+
+--------------------------------------------------------------------------------
 
 1.  DEFINITIONS
-For purposes of this Agreement:
-“Software” means all source code, object code, executable files, scripts, libraries, documentation, data files, and any other materials provided by HANDSBREADTH LLC under this Agreement, including any updates, upgrades, modifications, or derivative works thereof.
-“Licensee” means the individual or entity that has obtained this Software under the terms of this Agreement.
-“Licensor” means HANDSBREADTH LLC, a limited liability company, and its successors and assigns.
-“Permitted Use” means the specific use or uses expressly authorized in writing by Licensor in a separate written instrument signed by an authorized representative of Licensor.
-“Confidential Information” means the source code, internal design, architecture, and any non-public technical details of the Software.
 
-2.  GRANT OF LICENSE
-Subject to the terms and conditions of this Agreement, Licensor grants Licensee a limited, non-exclusive, non-transferable, non-sublicensable license solely to use the compiled, executable form of the Software for Licensee’s internal business purposes, unless a broader scope of use is expressly authorized in a separate written agreement signed by Licensor.
-No other rights are granted. All rights not expressly granted herein are reserved by Licensor.
+For purposes of this Agreement:
+
+"Software" means all source code, object code, executable files, scripts,
+libraries, binaries, documentation, data files, configuration files, and any
+other materials made available by HANDSBREADTH LLC under this Agreement,
+including any updates, upgrades, modifications, enhancements, or derivative
+works thereof, whether distributed as source code, as a compiled release
+artifact, or in any other form.
+
+"Licensee" or "You" means the individual or entity that accesses, clones,
+copies, installs, uses, or submits a Contribution to the Software.
+
+"Licensor" means HANDSBREADTH LLC, a limited liability company, and its
+successors and assigns.
+
+"Internal Use" means use of the Software by Licensee, on hardware owned or
+controlled by Licensee, solely for Licensee's own internal personal or business
+purposes. Internal Use expressly excludes any use that makes the Software, or
+any functionality of the Software, available to any third party, whether or not
+for a fee.
+
+"Modification" means any change to, adaptation of, translation of, or work based
+upon the Software, in whole or in part.
+
+"Contribution" means any Modification, source code, object code, patch, bug fix,
+enhancement, documentation, test, configuration, design, idea, suggestion, or
+other work of authorship that Licensee intentionally submits to Licensor for
+inclusion in or in connection with the Software, by any means, including without
+limitation a pull request, issue, patch file, electronic mail, or any other form
+of communication.
+
+"Contributor" means any Licensee that submits a Contribution.
+
+"Licensor Patent Rights" means any and all patents and patent applications
+anywhere in the world that are now or hereafter owned, controlled, or licensable
+by Licensor, including without limitation all provisionals, non-provisionals,
+continuations, continuations-in-part, divisionals, substitutions, reissues,
+re-examinations, renewals, extensions, supplementary protection certificates,
+utility models, and foreign counterparts of any of the foregoing, and all claims
+thereof, whether or not such patents or applications read on the Software.
+
+"Confidential Information" means any non-public information disclosed by
+Licensor to Licensee that is designated as confidential or that reasonably
+should be understood to be confidential. Source code that Licensor has made
+publicly available is not Confidential Information.
+
+--------------------------------------------------------------------------------
+
+2.  GRANT OF COPYRIGHT LICENSE
+
+Subject to Licensee's full compliance with the terms and conditions of this
+Agreement, and subject in all respects to the patent reservation in Section 4,
+Licensor grants Licensee a limited, non-exclusive, non-transferable,
+non-sublicensable, royalty-free, revocable license, under Licensor's copyrights
+only, to:
+
+    (a) access, view, and study the source code of the Software;
+
+    (b) clone, download, and make copies of the Software solely as reasonably
+        necessary to exercise the rights granted in this Section 2;
+
+    (c) install, execute, and use the Software for Internal Use;
+
+    (d) create Modifications of the Software solely for (i) Licensee's own
+        Internal Use, and (ii) the purpose of preparing and submitting a
+        Contribution to Licensor under Section 5; and
+
+    (e) publicly display or reference excerpts of the source code solely for the
+        purposes of commentary, discussion, bug reporting, or preparing a
+        Contribution.
+
+This Agreement grants rights under copyright only. No other rights are granted.
+All rights not expressly granted herein are reserved by Licensor. In particular,
+and without limiting Section 4, no patent rights whatsoever are granted.
+
+--------------------------------------------------------------------------------
 
 3.  RESTRICTIONS
-Except as expressly permitted in writing by HANDSBREADTH LLC, Licensee shall NOT:
-1.	Copy, reproduce, duplicate, or otherwise replicate the Software or any portion thereof, in whole or in part, in any form or medium;
-2.	Modify, adapt, translate, alter, or create derivative works based upon the Software or any part thereof;
-3.	Reverse engineer, disassemble, decompile, decode, or otherwise attempt to derive or gain access to the source code of the Software;
-4.	Distribute, sell, sublicense, rent, lease, lend, transfer, assign, or otherwise make the Software available to any third party;
-5.	Merge the Software with any other software without prior written authorization from Licensor;
-6.	Remove, alter, obscure, or modify any proprietary notices, labels, markings, copyright notices, or legends appearing on or within the Software;
-7.	Use the Software to develop or offer any product or service that competes with any product or service offered by Licensor.
 
-4.  WRITTEN PERMISSION
-Any use of the Software beyond the limited rights expressly granted in Section 2 — including, without limitation, any copying, modification, distribution, or creation of derivative works — requires prior written permission from HANDSBREADTH LLC. Such permission, if granted, will be set forth in a separate written instrument executed by an authorized officer of HANDSBREADTH LLC. Requests for written permission should be directed to:
+Except as expressly permitted in Section 2, or as separately authorized in
+writing by an authorized officer of HANDSBREADTH LLC, Licensee shall NOT:
 
-HANDSBREADTH LLC Licensing Department
-4629 N. Malden St.
-#1S
-Chicago, IL 60640
+    1.  Distribute, publish, sell, resell, sublicense, rent, lease, lend,
+        transfer, assign, or otherwise make the Software or any Modification
+        available to any third party, in source or binary form, in whole or in
+        part;
 
-Oral approvals or representations by any employee, agent, or representative of Licensor shall not constitute written permission and shall not be binding upon Licensor.
+    2.  Host, operate, or otherwise make the Software or any Modification
+        available to third parties as a hosted, managed, or software-as-a-service
+        offering, or as part of any service bureau, outsourcing, or similar
+        arrangement, whether or not for a fee;
 
-5.  OWNERSHIP AND INTELLECTUAL PROPERTY
-The Software, including all copies and portions thereof, is and shall remain the sole and exclusive property of HANDSBREADTH LLC. This Agreement does not convey to Licensee any ownership interest in or to the Software, or any intellectual property rights therein. All title, ownership, and intellectual property rights (including, without limitation, copyrights, patents, trade secrets, and trademarks) in and to the Software are and shall remain exclusively vested in Licensor.
-Licensee acknowledges that the Software constitutes valuable Confidential Information and trade secrets of Licensor, and agrees to take all reasonable measures to protect the confidentiality of the Software and prevent unauthorized access or disclosure.
+    3.  Use the Software, any Modification, or any information derived from the
+        Software to develop, market, or offer any product or service that
+        competes with any product or service offered or planned by Licensor;
 
-6.  CONFIDENTIALITY
-Licensee agrees to hold the Software and all Confidential Information in strict confidence and to use no less than reasonable care in protecting such Confidential Information from unauthorized disclosure. Licensee shall not disclose, publish, or disseminate any Confidential Information to any third party without the prior written consent of Licensor. These obligations of confidentiality shall survive the termination or expiration of this Agreement for a period of five (5) years.
+    4.  Fork the Software for the purpose of maintaining or promoting an
+        independent or competing distribution of the Software;
 
-7.  TERM AND TERMINATION
-This Agreement is effective as of the date Licensee first installs, accesses, or uses the Software and shall continue until terminated.
-Licensor may terminate this Agreement immediately upon written notice if Licensee breaches any term or condition of this Agreement and fails to cure such breach within ten (10) days of receiving written notice thereof.
-Upon termination of this Agreement for any reason, all rights and licenses granted herein shall immediately cease, and Licensee shall: (a) immediately cease all use of the Software; (b) permanently delete or destroy all copies of the Software in Licensee’s possession or control; and (c) certify in writing to Licensor that such destruction has been completed.
+    5.  Remove, alter, obscure, or modify any proprietary notices, labels,
+        markings, copyright notices, patent markings, attributions, or legends
+        appearing on or within the Software, including this Agreement;
 
-8.  DISCLAIMER OF WARRANTIES
-THE SOFTWARE IS PROVIDED “AS IS” WITHOUT WARRANTY OF ANY KIND. LICENSOR EXPRESSLY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT. LICENSOR DOES NOT WARRANT THAT THE SOFTWARE WILL BE UNINTERRUPTED, ERROR-FREE, OR FREE OF HARMFUL COMPONENTS.
+    6.  Use any name, trademark, service mark, trade name, or logo of Licensor,
+        including "HANDSBREADTH" and "Handsbreadth Task Server", except for
+        factual, nominative references to the Software;
 
-9.  LIMITATION OF LIABILITY
-TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, LOSS OF PROFITS, LOSS OF DATA, BUSINESS INTERRUPTION, OR LOSS OF BUSINESS GOODWILL) ARISING OUT OF OR RELATED TO THIS AGREEMENT OR THE USE OR INABILITY TO USE THE SOFTWARE, EVEN IF LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. LICENSOR’S TOTAL CUMULATIVE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT SHALL NOT EXCEED THE AMOUNT PAID BY LICENSEE TO LICENSOR FOR THE SOFTWARE IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM.
+    7.  Incorporate the Software into, or combine the Software with, any code
+        licensed under terms that would purport to require Licensor to license
+        the Software, any Modification, or any Licensor Patent Rights on terms
+        other than those set forth in this Agreement; or
 
-10.  INDEMNIFICATION
-Licensee agrees to indemnify, defend, and hold harmless HANDSBREADTH LLC and its officers, directors, employees, agents, and successors from and against any claims, liabilities, damages, losses, and expenses (including reasonable attorneys’ fees) arising out of or in any way connected with: (a) Licensee’s use of the Software; (b) Licensee’s breach of this Agreement; or (c) any unauthorized copying, modification, or distribution of the Software by Licensee.
+    8.  Circumvent, disable, or interfere with any license key, entitlement
+        check, usage limitation, or security mechanism in the Software.
 
-11.  GOVERNING LAW AND DISPUTE RESOLUTION
-This Agreement shall be governed by and construed in accordance with the laws of the applicable jurisdiction in which HANDSBREADTH LLC is organized, without regard to its conflict of law principles. Any dispute arising out of or relating to this Agreement shall be resolved by binding arbitration or litigation in the courts of competent jurisdiction as designated by Licensor, and Licensee hereby consents to the exclusive jurisdiction of such courts.
+For the avoidance of doubt, nothing in this Agreement restricts Licensee from
+exercising any right that cannot lawfully be restricted under applicable
+mandatory law, including any non-waivable rights of decompilation for
+interoperability under applicable law.
 
-12.  GENERAL PROVISIONS
-Entire Agreement. This Agreement constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior and contemporaneous understandings, agreements, representations, and warranties, whether oral or written, regarding such subject matter.
+--------------------------------------------------------------------------------
 
-Severability. If any provision of this Agreement is held to be invalid, illegal, or unenforceable, the remaining provisions shall continue in full force and effect.
+4.  RESERVATION OF PATENT RIGHTS
 
-No Waiver. Failure by either party to enforce any provision of this Agreement shall not constitute a waiver of future enforcement of that or any other provision.
+THIS SECTION IS A MATERIAL TERM OF THIS AGREEMENT.
 
-Amendments. This Agreement may not be amended, modified, or supplemented except by a written instrument signed by an authorized representative of Licensor.
+4.1  No Patent License. NO LICENSE, IMMUNITY, COVENANT, OR OTHER RIGHT UNDER ANY
+LICENSOR PATENT RIGHTS IS GRANTED BY THIS AGREEMENT, WHETHER EXPRESSLY, BY
+IMPLICATION, BY ESTOPPEL, BY ACQUIESCENCE, BY EXHAUSTION, OR OTHERWISE. The
+rights granted in Section 2 are granted solely under Licensor's copyrights.
 
-No Assignment. Licensee may not assign or transfer this Agreement or any rights hereunder without the prior written consent of Licensor. Any attempted assignment without such consent shall be null and void.
+4.2  All Patent Rights Reserved. Licensor expressly reserves, retains, and does
+not convey any and all Licensor Patent Rights, including the sole and exclusive
+right to apply for, prosecute, obtain, maintain, license, enforce, assign, and
+otherwise exploit any and all Licensor Patent Rights anywhere in the world.
 
-Notices. All notices under this Agreement shall be in writing and delivered to HANDSBREADTH LLC at its principal place of business.
-HANDSBREADTH LLC
+4.3  No Covenant Not to Sue. Nothing in this Agreement constitutes, or shall be
+construed as, a covenant not to sue, a non-assertion agreement, a release, a
+waiver, or a forbearance with respect to any Licensor Patent Rights.
 
-© 2026 HANDSBREADTH LLC. All Rights Reserved. Unauthorized copying, modification, distribution, or use of this Software, via any medium, is strictly prohibited except where permitted in writing by HANDSBREADTH LLC.
+4.4  Publication Is Not a Grant or Dedication. Licensee acknowledges and agrees
+that Licensor's act of making the source code of the Software publicly available,
+of accepting Contributions, or of publishing release artifacts, is NOT and shall
+not be construed as: (a) a grant of any license under any Licensor Patent Rights;
+(b) a dedication of any invention to the public; (c) an abandonment, disclaimer,
+or waiver of any Licensor Patent Rights; (d) an authorized sale or first sale
+giving rise to patent exhaustion; or (e) any representation that practicing the
+Software does not infringe any Licensor Patent Rights.
 
+4.5  No Implied License from Conduct. No course of dealing, course of
+performance, usage of trade, delay in enforcement, or failure to assert any
+Licensor Patent Rights shall give rise to any implied license, estoppel, laches
+defense, or other limitation on Licensor's ability to assert Licensor Patent
+Rights, to the maximum extent permitted by applicable law.
 
+4.6  Use at Licensee's Own Patent Risk. Licensee acknowledges that the rights
+granted in Section 2 may be insufficient to practice the Software without
+infringing Licensor Patent Rights, and that Licensee's exercise of the rights
+granted in Section 2 is undertaken at Licensee's own risk with respect to
+Licensor Patent Rights. Any license under Licensor Patent Rights must be obtained
+by separate written agreement executed by an authorized officer of Licensor.
+
+4.7  Defensive Termination. If Licensee or any of its affiliates institutes,
+funds, or voluntarily participates in any patent infringement claim, action,
+counterclaim, opposition, inter partes review, or other proceeding against
+Licensor or against any user of the Software, alleging that the Software or any
+Contribution constitutes direct or contributory patent infringement or induces
+patent infringement, then all rights granted to Licensee under this Agreement
+shall terminate automatically and immediately as of the date such proceeding is
+instituted.
+
+4.8  Marking. Licensee shall not remove or alter any patent marking or "patent
+pending" notice included in or with the Software.
+
+--------------------------------------------------------------------------------
+
+5.  CONTRIBUTIONS AND ASSIGNMENT OF CONTRIBUTOR RIGHTS
+
+5.1  Assignment. Contributor hereby irrevocably assigns, transfers, and conveys
+to Licensor, and agrees to assign, transfer, and convey to Licensor, all right,
+title, and interest worldwide in and to each Contribution and all intellectual
+property rights therein, including without limitation all copyrights, patent
+rights (including the right to apply for and prosecute patents on any invention
+disclosed or embodied in the Contribution, and all continuations,
+continuations-in-part, divisionals, reissues, and foreign counterparts thereof),
+trade secret rights, database rights, and all other proprietary rights,
+together with all causes of action and rights of recovery for past, present, and
+future infringement thereof. Contributor agrees that Licensor shall be the sole
+and exclusive owner of each Contribution upon submission.
+
+5.2  Fallback License. To the extent that any assignment under Section 5.1 is
+held to be invalid, unenforceable, or ineffective for any reason, or is not
+permitted under applicable law, Contributor hereby grants to Licensor a
+perpetual, irrevocable, worldwide, royalty-free, fully paid-up, non-exclusive,
+transferable, sublicensable (through multiple tiers) license, under all
+intellectual property rights owned or controlled by Contributor, to use,
+reproduce, prepare derivative works of, publicly display, publicly perform,
+distribute, sublicense, make, have made, use, sell, offer for sale, import, and
+otherwise exploit the Contribution and such derivative works, in any form and for
+any purpose, without any obligation of accounting, attribution, notice, or
+compensation to Contributor.
+
+5.3  Contributor Patent Grant. Contributor hereby grants to Licensor a
+perpetual, irrevocable, worldwide, royalty-free, fully paid-up, non-exclusive,
+transferable, sublicensable (through multiple tiers) license under all patents
+and patent applications owned or controlled by Contributor that are necessarily
+infringed by the Contribution alone or by combination of the Contribution with
+the Software, to make, have made, use, offer for sale, sell, import, and
+otherwise transfer the Contribution and the Software.
+
+5.4  Contributor Representations. Contributor represents and warrants that:
+(a) each Contribution is Contributor's original work, or Contributor has
+sufficient rights to make the assignment and grants in this Section 5;
+(b) each Contribution does not, to Contributor's knowledge, infringe or
+misappropriate the intellectual property rights of any third party;
+(c) if Contributor's employer has rights to intellectual property that
+Contributor creates, Contributor has received written permission to make the
+Contribution on behalf of that employer, or the employer has waived such rights;
+(d) Contributor has identified in the Contribution any third-party materials
+included therein and the license terms applicable to such materials; and
+(e) Contributor is legally entitled to enter into this Agreement.
+
+5.5  Waiver of Moral Rights. To the maximum extent permitted by applicable law,
+Contributor irrevocably waives, and agrees not to assert against Licensor or its
+licensees, any moral rights, rights of attribution, rights of integrity, or
+similar rights in any Contribution.
+
+5.6  No Obligation. Licensor is under no obligation to accept, review, use,
+retain, or incorporate any Contribution, and may modify, reject, or remove any
+Contribution at its sole discretion. Contributor receives no compensation,
+attribution right, ownership interest, or license under any Licensor Patent
+Rights in exchange for any Contribution.
+
+5.7  Further Assurances. Contributor agrees to execute any documents and take any
+further actions reasonably requested by Licensor to perfect, record, or enforce
+the assignment and grants in this Section 5, and irrevocably appoints Licensor as
+Contributor's attorney-in-fact, coupled with an interest, solely for the purpose
+of executing such documents if Contributor fails to do so within thirty (30) days
+of written request.
+
+5.8  Contributions Are Not Confidential. Contributor acknowledges that
+Contributions submitted through public channels are public, and Licensor has no
+obligation of confidentiality with respect to them.
+
+--------------------------------------------------------------------------------
+
+6.  OWNERSHIP AND INTELLECTUAL PROPERTY
+
+The Software, including all copies, Modifications, Contributions, and portions
+thereof, is and shall remain the sole and exclusive property of HANDSBREADTH LLC.
+This Agreement does not convey to Licensee any ownership interest in or to the
+Software or any intellectual property rights therein. All title, ownership, and
+intellectual property rights (including, without limitation, copyrights, patents,
+trade secrets, trademarks, and database rights) in and to the Software are and
+shall remain exclusively vested in Licensor.
+
+Licensee acquires no rights in the Software other than the limited copyright
+rights expressly granted in Section 2. The public availability of the source code
+does not place the Software in the public domain and does not diminish Licensor's
+ownership.
+
+--------------------------------------------------------------------------------
+
+7.  CONFIDENTIALITY
+
+Licensee agrees to hold all Confidential Information in strict confidence and to
+use no less than reasonable care in protecting it from unauthorized disclosure.
+Licensee shall not disclose, publish, or disseminate any Confidential Information
+to any third party without the prior written consent of Licensor. These
+obligations survive termination of this Agreement for a period of five (5) years.
+For clarity, this Section does not apply to source code or other materials that
+Licensor has made publicly available.
+
+--------------------------------------------------------------------------------
+
+8.  TERM AND TERMINATION
+
+This Agreement is effective as of the date Licensee first accesses, clones,
+installs, or uses the Software, or submits a Contribution, and continues until
+terminated.
+
+Licensor may terminate this Agreement immediately upon written notice if Licensee
+breaches any term or condition and fails to cure such breach within ten (10) days
+of receiving written notice thereof. Termination under Section 4.7 is automatic
+and requires no notice.
+
+Upon termination for any reason, all rights and licenses granted to Licensee
+shall immediately cease, and Licensee shall: (a) immediately cease all use of the
+Software; (b) permanently delete or destroy all copies of the Software and all
+Modifications in Licensee's possession or control; and (c) upon request, certify
+in writing to Licensor that such destruction has been completed.
+
+Sections 4, 5, 6, 7, 9, 10, 11, 12, and 13 survive any termination or expiration
+of this Agreement. For the avoidance of doubt, the assignment and grants made by
+a Contributor under Section 5 are irrevocable and survive termination.
+
+--------------------------------------------------------------------------------
+
+9.  DISCLAIMER OF WARRANTIES
+
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTY OF ANY KIND.
+LICENSOR EXPRESSLY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY,
+OR OTHERWISE, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+LICENSOR DOES NOT WARRANT THAT THE SOFTWARE WILL BE UNINTERRUPTED, ERROR-FREE, OR
+FREE OF HARMFUL COMPONENTS. WITHOUT LIMITING SECTION 4, LICENSOR MAKES NO
+REPRESENTATION OR WARRANTY THAT USE OF THE SOFTWARE DOES NOT INFRINGE ANY PATENT,
+INCLUDING ANY LICENSOR PATENT RIGHTS.
+
+--------------------------------------------------------------------------------
+
+10.  LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL LICENSOR BE
+LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, LOSS OF PROFITS, LOSS OF
+DATA, BUSINESS INTERRUPTION, OR LOSS OF BUSINESS GOODWILL) ARISING OUT OF OR
+RELATED TO THIS AGREEMENT OR THE USE OR INABILITY TO USE THE SOFTWARE, EVEN IF
+LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. LICENSOR'S TOTAL
+CUMULATIVE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT SHALL NOT EXCEED
+THE GREATER OF (A) THE AMOUNT PAID BY LICENSEE TO LICENSOR FOR THE SOFTWARE IN
+THE TWELVE (12) MONTHS PRECEDING THE CLAIM, OR (B) ONE HUNDRED U.S. DOLLARS
+($100.00).
+
+--------------------------------------------------------------------------------
+
+11.  INDEMNIFICATION
+
+Licensee agrees to indemnify, defend, and hold harmless HANDSBREADTH LLC and its
+officers, directors, employees, agents, and successors from and against any
+claims, liabilities, damages, losses, and expenses (including reasonable
+attorneys' fees) arising out of or in any way connected with: (a) Licensee's use
+of the Software; (b) Licensee's breach of this Agreement; (c) any unauthorized
+copying, modification, or distribution of the Software by Licensee; or (d) any
+claim that a Contribution submitted by Licensee infringes or misappropriates the
+intellectual property rights of a third party.
+
+--------------------------------------------------------------------------------
+
+12.  GOVERNING LAW AND DISPUTE RESOLUTION
+
+This Agreement shall be governed by and construed in accordance with the laws of
+the State of Illinois, United States of America, without regard to its conflict
+of law principles. The United Nations Convention on Contracts for the
+International Sale of Goods does not apply.
+
+Any dispute arising out of or relating to this Agreement shall be brought
+exclusively in the state or federal courts located in Cook County, Illinois, and
+Licensee hereby consents to the exclusive jurisdiction and venue of such courts
+and waives any objection based on inconvenient forum. Notwithstanding the
+foregoing, Licensor may seek injunctive or other equitable relief, and may bring
+any claim for infringement of Licensor Patent Rights or other intellectual
+property rights, in any court of competent jurisdiction anywhere in the world.
+
+--------------------------------------------------------------------------------
+
+13.  GENERAL PROVISIONS
+
+Entire Agreement. This Agreement constitutes the entire agreement between the
+parties with respect to the subject matter hereof and supersedes all prior and
+contemporaneous understandings, agreements, representations, and warranties,
+whether oral or written, regarding such subject matter.
+
+Severability. If any provision of this Agreement is held to be invalid, illegal,
+or unenforceable, that provision shall be modified to the minimum extent
+necessary to make it enforceable, and the remaining provisions shall continue in
+full force and effect. If Section 4 or Section 5 is held unenforceable in whole
+or in part, the parties intend that it be enforced to the maximum extent
+permitted by law.
+
+No Waiver. Failure by Licensor to enforce any provision of this Agreement shall
+not constitute a waiver of future enforcement of that or any other provision, and
+shall not give rise to any implied license under Section 4.
+
+Amendments. This Agreement may not be amended, modified, or supplemented except
+by a written instrument signed by an authorized representative of Licensor.
+Licensor may issue future versions of the Software under different terms.
+
+No Assignment. Licensee may not assign or transfer this Agreement or any rights
+hereunder without the prior written consent of Licensor. Any attempted assignment
+without such consent shall be null and void. Licensor may freely assign this
+Agreement.
+
+Relationship. Nothing in this Agreement creates any partnership, joint venture,
+agency, fiduciary, or employment relationship between the parties.
+
+Notices. All notices under this Agreement shall be in writing and delivered to:
+
+    HANDSBREADTH LLC
+    Licensing Department
+    4629 N. Malden St., #1S
+    Chicago, IL 60640
+    United States
+
+Requests for a patent license, a redistribution license, a commercial license, or
+any other permission beyond the limited rights granted in Section 2 should be
+directed to the address above. Oral approvals or representations by any employee,
+agent, or representative of Licensor shall not constitute written permission and
+shall not be binding upon Licensor.
+
+--------------------------------------------------------------------------------
+
+(c) 2026 HANDSBREADTH LLC. All Rights Reserved.
+
+The source code of this Software is publicly viewable. It is NOT open source and
+NOT in the public domain. Unauthorized copying, modification, distribution, or
+use of this Software, via any medium, is strictly prohibited except as expressly
+permitted in Section 2 or authorized in writing by HANDSBREADTH LLC. ALL PATENT
+RIGHTS ARE EXPRESSLY RESERVED AND NO PATENT LICENSE IS GRANTED.
