@@ -35,6 +35,7 @@ build/
 !AUTOSTART.md
 !CONTRIBUTING.md
 !CLA.md
+!.github/PULL_REQUEST_TEMPLATE.md
 
 # Local-run artifacts and app bundles
 hb-task-server.app
