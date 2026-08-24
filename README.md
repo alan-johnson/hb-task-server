@@ -253,4 +253,41 @@ This updates `package.json` and creates a git tag automatically. Alternatively, 
 
 ## License
 
-Copyright © 2026 Handsbreadth LLC. All rights reserved.
+Copyright © 2026 HANDSBREADTH LLC. All rights reserved.
+
+**This project is source-available, not open source.** The source code is
+publicly viewable, but the software is proprietary and all patent rights are
+expressly reserved. See [LICENSE.txt](LICENSE.txt) for the full terms.
+
+**You may:**
+
+- View, clone, and study the source
+- Run and use it locally for your own personal or internal business purposes
+- Modify it for your own internal use, or to prepare a contribution
+
+**You may not:**
+
+- Redistribute the software or your modifications, in source or binary form
+- Host or offer it to third parties as a service
+- Use it to build a competing product or service
+- Remove or alter proprietary notices
+
+No patent license is granted, whether express, implied, or by estoppel. See
+Section 4 of [LICENSE.txt](LICENSE.txt).
+
+For commercial licensing, redistribution rights, or a patent license, write to
+the Licensing Department address in Section 13 of [LICENSE.txt](LICENSE.txt).
+
+---
+
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before
+opening a pull request.
+
+All contributors must sign the [Contributor License Agreement](CLA.md), which
+assigns copyright and patent rights in contributions to HANDSBREADTH LLC. A bot
+checks this automatically on every pull request.
+
+Found a security issue? Do not open a public issue — see the security section of
+[CONTRIBUTING.md](CONTRIBUTING.md).
