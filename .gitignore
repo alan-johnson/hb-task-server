@@ -33,6 +33,8 @@ build/
 !QUICKSTART.md
 !BUILD.md
 !AUTOSTART.md
+!CONTRIBUTING.md
+!CLA.md
 
 # Enterprise version: macOS-only providers (require AppleScript / local macOS binary)
 src/providers/apple/
