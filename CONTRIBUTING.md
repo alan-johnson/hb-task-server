@@ -55,10 +55,22 @@ before writing code.
 ### Good candidates
 
 - Bug fixes with a clear reproduction
-- New task providers (see below)
+- New task providers — **open an issue first**, see scope below
 - Error handling and input validation improvements
 - Documentation fixes and clarifications
 - macOS compatibility fixes
+
+### Out of scope
+
+This project's scope is **Apple Reminders, exposed over a local REST API**.
+
+- **Google Tasks and Microsoft To Do providers are not planned.** Earlier issues
+  proposing them were closed as out of scope; PRs adding them will not be
+  merged.
+- New providers for other systems are considered case by case, but are not
+  automatically welcome. Open an issue and get agreement before writing code —
+  each provider is ongoing maintenance and permissions surface, so demand has to
+  justify it.
 
 ### Please discuss first
 
